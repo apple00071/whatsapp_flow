@@ -33,7 +33,7 @@ app.prepare().then(() => {
   
   // CORS configuration
   server.use(cors({
-    origin: process.env.CLIENT_URL || '*',
+    origin: process.env.CLIENT_URL || ['https://whatsapp-flow.vercel.app', 'http://localhost:3000'],
     methods: ['GET', 'POST', 'OPTIONS'],
     credentials: true
   }));
