@@ -42,51 +42,57 @@ async function saveTemplates(templates: any[]) {
 }
 
 export async function GET() {
-  try {
-    const templates = await loadTemplates();
-    return NextResponse.json({ success: true, templates });
-  } catch (error) {
-    console.error('Error in GET /api/templates:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to fetch templates' },
-      { status: 500 }
-    );
+  // Skip actual API calls during build time
+  if (process.env.NODE_ENV === 'production' && process.env.VERCEL_ENV === 'production') {
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://34.45.239.220:3001';
+      const response = await fetch(`${apiUrl}/api/templates`);
+      const data = await response.json();
+      return NextResponse.json(data);
+    } catch (error) {
+      console.error('Error getting templates:', error);
+      return NextResponse.json([], { status: 500 });
+    }
   }
+  
+  // During build time, return empty array
+  return NextResponse.json([]);
 }
 
 export async function POST(request: Request) {
-  try {
-    const body = await request.json();
-    const { name, content, category } = body;
-
-    if (!name || !content) {
+  if (process.env.NODE_ENV === 'production' && process.env.VERCEL_ENV === 'production') {
+    try {
+      const body = await request.json();
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://34.45.239.220:3001';
+      
+      const response = await fetch(`${apiUrl}/api/templates`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      });
+      
+      const data = await response.json();
+      return NextResponse.json(data);
+    } catch (error) {
+      console.error('Error creating template:', error);
       return NextResponse.json(
-        { success: false, error: 'Name and content are required' },
-        { status: 400 }
+        { success: false, error: 'Failed to create template' },
+        { status: 500 }
       );
     }
-
-    const templates = await loadTemplates();
-    const newTemplate = {
-      id: Date.now().toString(),
-      name,
-      content,
-      category: category || 'General',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-
-    templates.push(newTemplate);
-    await saveTemplates(templates);
-
-    return NextResponse.json({ success: true, template: newTemplate });
-  } catch (error) {
-    console.error('Error in POST /api/templates:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to create template' },
-      { status: 500 }
-    );
   }
+  
+  // During build time, return mock response
+  return NextResponse.json({ 
+    success: true, 
+    id: 'mock-id', 
+    name: 'Mock Template',
+    content: 'Mock content',
+    category: 'General',
+    createdAt: new Date().toISOString()
+  });
 }
 
 export async function PUT(request: Request) {

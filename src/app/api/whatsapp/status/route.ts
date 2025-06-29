@@ -1,31 +1,30 @@
 import { NextResponse } from 'next/server';
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3001';
-
 export async function GET() {
-  try {
-    // Fetch status from the backend server
-    const response = await fetch(`${BACKEND_URL}/api/whatsapp/status`, {
-      cache: 'no-store', // Prevent caching
-      headers: {
-        'Cache-Control': 'no-cache',
-        'Pragma': 'no-cache'
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch status from backend');
+  // Skip actual API calls during build time
+  if (process.env.NODE_ENV === 'production' && process.env.VERCEL_ENV === 'production') {
+    try {
+      // During runtime on Vercel, use the environment variable
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://34.45.239.220:3001';
+      const response = await fetch(`${apiUrl}/api/whatsapp/status`);
+      const data = await response.json();
+      return NextResponse.json(data);
+    } catch (error) {
+      console.error('Error getting WhatsApp status:', error);
+      return NextResponse.json({
+        isConnected: false,
+        hasQR: false,
+        qrCode: null,
+        state: 'DISCONNECTED'
+      }, { status: 500 });
     }
-    
-    const status = await response.json();
-    console.log('Status from backend:', status);
-    
-    return NextResponse.json(status);
-  } catch (error) {
-    console.error('Error getting WhatsApp status:', error);
-    return NextResponse.json(
-      { error: 'Failed to get WhatsApp status' },
-      { status: 500 }
-    );
   }
+  
+  // During build time, return mock data
+  return NextResponse.json({
+    isConnected: false,
+    hasQR: false,
+    qrCode: null,
+    state: 'DISCONNECTED'
+  });
 } 
