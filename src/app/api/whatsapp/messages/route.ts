@@ -58,12 +58,12 @@ export async function GET() {
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://34.45.239.220:3001';
       const response = await fetch(`${apiUrl}/api/whatsapp/messages`);
-      const data = await response.json();
-      return NextResponse.json(data);
-    } catch (error) {
+    const data = await response.json();
+    return NextResponse.json(data);
+  } catch (error) {
       console.error('Error getting messages:', error);
       return NextResponse.json([], { status: 500 });
-    }
+  }
   }
   
   // During build time, return empty array
@@ -73,7 +73,7 @@ export async function GET() {
 // POST: Add a new message to history
 export async function POST(request: Request) {
   if (process.env.NODE_ENV === 'production' && process.env.VERCEL_ENV === 'production') {
-    try {
+  try {
       const body = await request.json();
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://34.45.239.220:3001';
       

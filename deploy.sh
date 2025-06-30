@@ -187,4 +187,34 @@ echo "Please make sure to:"
 echo "1. Edit the .env.production file with your specific configuration"
 echo "2. Update the Nginx configuration with your domain name"
 echo "3. Set up SSL with Let's Encrypt by running 'sudo certbot --nginx -d your-domain.com'"
-echo "4. Monitor the application with 'pm2 logs whatsapp-flow' or 'pm2 monit'" 
+echo "4. Monitor the application with 'pm2 logs whatsapp-flow' or 'pm2 monit'"
+
+# Stop all running processes
+sudo pm2 delete all
+sudo killall node
+
+# Clean up old files
+cd ~
+sudo rm -rf whatsapp-api
+mkdir -p whatsapp-api/src/lib whatsapp-api/data whatsapp-api/.wwebjs_auth/session-whatsapp-flow
+
+# Copy files
+cp server.js whatsapp-api/
+cp package.json whatsapp-api/
+cp src/lib/messageQueue.js whatsapp-api/src/lib/
+cp src/lib/rateLimiter.js whatsapp-api/src/lib/
+
+# Set permissions
+sudo chown -R user:user whatsapp-api
+sudo chmod -R 755 whatsapp-api
+
+# Install dependencies
+cd whatsapp-api
+npm install
+
+# Start the server
+sudo NODE_ENV=production PORT=3001 pm2 start server.js --name whatsapp-flow
+sudo pm2 save
+
+# Show logs
+pm2 logs whatsapp-flow 

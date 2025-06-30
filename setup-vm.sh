@@ -1,66 +1,83 @@
 #!/bin/bash
 
-# Comprehensive setup script for WhatsApp Flow backend
-echo "Setting up WhatsApp Flow backend..."
+# Fix script for WhatsApp Flow backend
+echo "Fixing WhatsApp Flow backend setup..."
 
-# Update system packages
-echo "Updating system packages..."
+# Stop any existing processes
+echo "Stopping existing processes..."
+sudo pm2 stop all || true
+sudo pm2 delete all || true
+
+# Clean up duplicate directories
+echo "Cleaning up duplicate directories..."
+if [ -d ~/whatsapp_flow/whatsapp_flow ]; then
+  # If we have a nested directory, move everything to the parent
+  sudo cp -r ~/whatsapp_flow/whatsapp_flow/* ~/whatsapp_flow/
+  sudo rm -rf ~/whatsapp_flow/whatsapp_flow
+fi
+
+# Create necessary directories
+echo "Creating necessary directories..."
+sudo mkdir -p ~/whatsapp_flow/data
+sudo mkdir -p ~/whatsapp_flow/logs
+sudo mkdir -p ~/whatsapp_flow/.wwebjs_auth
+
+# Set proper permissions
+echo "Setting proper permissions..."
+sudo chown -R $(whoami):$(whoami) ~/whatsapp_flow
+sudo chmod -R 755 ~/whatsapp_flow
+
+# Create empty data files
+echo "Creating data files..."
+sudo touch ~/whatsapp_flow/data/messages.json
+sudo touch ~/whatsapp_flow/data/templates.json
+sudo touch ~/whatsapp_flow/data/users.json
+sudo chmod 666 ~/whatsapp_flow/data/*.json
+
+# Get external IP
+EXTERNAL_IP=$(curl -s http://ipinfo.io/ip)
+
+# Create environment file
+echo "Creating .env file..."
+cat > ~/whatsapp_flow/.env << EOF
+NODE_ENV=production
+PORT=80
+JWT_SECRET=whatsapp-flow-secret-key
+CHROME_PATH=/usr/bin/google-chrome
+CLIENT_URL=https://whatsapp-flow-psi.vercel.app
+EXTERNAL_IP=$EXTERNAL_IP
+EOF
+
+# Install dependencies
+echo "Installing dependencies..."
+cd ~/whatsapp_flow
+npm install --production
+
+# Install Chrome
+echo "Installing Chrome..."
 sudo apt update
 sudo apt install -y curl wget build-essential git
-
-# Install Node.js 18
-echo "Installing Node.js 18..."
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-sudo apt install -y nodejs
-node -v
-npm -v
-
-# Install PM2 globally
-echo "Installing PM2..."
-sudo npm install -g pm2
-
-# Install Google Chrome (required for WhatsApp Web)
-echo "Installing Google Chrome..."
 wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 sudo apt install -y ./google-chrome-stable_current_amd64.deb
 rm google-chrome-stable_current_amd64.deb
 
-# Create data directory
-echo "Creating data directory..."
-mkdir -p ~/whatsapp_flow/data
+# Open firewall for port 80
+echo "Opening firewall for port 80..."
+sudo ufw allow 80/tcp || true
 
-# Install project dependencies
-echo "Installing project dependencies..."
-cd ~/whatsapp_flow
-npm install express http whatsapp-web.js qrcode cors fs path next helmet express-rate-limit jsonwebtoken
-
-# Create environment file
-echo "Creating .env file..."
-cat > .env << EOF
-NODE_ENV=production
-PORT=3001
-JWT_SECRET=whatsapp-flow-secret-key
-CHROME_PATH=/usr/bin/google-chrome
-CLIENT_URL=http://whatsapp-flow-psi.vercel.app
-EOF
-
-# Open firewall port
-echo "Opening firewall port 3001..."
-sudo ufw allow 3001/tcp
-
-# Start the server
+# Start the server with PM2
 echo "Starting the server..."
-pm2 stop whatsapp-flow || true
-pm2 delete whatsapp-flow || true
-pm2 start server.js --name whatsapp-flow
+cd ~/whatsapp_flow
+sudo pm2 start server.js --name whatsapp-flow
+sudo pm2 save
+sudo pm2 startup
 
-# Save PM2 configuration
-echo "Saving PM2 configuration..."
-pm2 save
+# Check if the server is running
+echo "Checking server status..."
+sudo pm2 list
+sudo pm2 logs whatsapp-flow --lines 10
 
-# Set PM2 to start on boot
-echo "Setting PM2 to start on boot..."
-pm2 startup | tail -n 1 | bash
-
-echo "Setup complete! The server should be running at http://$(hostname -I | awk '{print $1}'):3001"
-echo "External IP: $(curl -s http://ipinfo.io/ip)" 
+# Print server information
+echo "Backend API Server should be accessible at:"
+echo "http://$EXTERNAL_IP:80"
+echo "Frontend is deployed at: https://whatsapp-flow-psi.vercel.app" 
