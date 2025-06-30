@@ -221,7 +221,7 @@ async function initializeClient() {
       
       // Attempt to reinitialize after a delay
       setTimeout(() => {
-        initializeClient();
+          initializeClient();
       }, 5000);
     });
 
@@ -234,7 +234,7 @@ async function initializeClient() {
     
     // Attempt to reinitialize after a delay
     setTimeout(() => {
-      initializeClient();
+        initializeClient();
     }, 5000);
   }
 }
@@ -269,16 +269,16 @@ app.post('/api/whatsapp/messages', async (req, res) => {
 });
 
 app.post('/api/whatsapp/bulk', async (req, res) => {
-  if (!isConnected) {
+      if (!isConnected) {
     return res.status(400).json({ success: false, error: 'WhatsApp is not connected' });
-  }
+    }
 
   const { messages } = req.body;
   if (!Array.isArray(messages) || messages.length === 0) {
     return res.status(400).json({ success: false, error: 'Messages array is required' });
-  }
+    }
 
-  try {
+    try {
     await queueBulkMessages(messages);
     res.json({ success: true, message: 'Bulk messages queued successfully' });
   } catch (error) {
@@ -309,12 +309,12 @@ app.post('/api/whatsapp/disconnect', async (req, res) => {
   try {
     if (client) {
       await client.destroy();
-      client = null;
+    client = null;
       global.whatsappClient = null;
-      isConnected = false;
-      qrCode = null;
-      qrCodeDataURL = null;
-      initializationInProgress = false;
+    isConnected = false;
+    qrCode = null;
+    qrCodeDataURL = null;
+    initializationInProgress = false;
     }
     res.json({ success: true, message: 'Disconnected successfully' });
   } catch (error) {
@@ -363,7 +363,7 @@ app.listen(PORT, '0.0.0.0', (err) => {
   if (err) {
     console.error('Error starting server:', err);
     process.exit(1);
-  }
+    }
   console.log(`WhatsApp API Server is running on port ${PORT}`);
   
   // Initialize WhatsApp client

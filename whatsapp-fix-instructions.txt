@@ -1,0 +1,171 @@
+WhatsApp API Fix Instructions
+==========================
+
+Here are the steps to fix your WhatsApp API and get the QR code for authentication:
+
+1. SSH into your VM:
+   ```
+   ssh applegraphicshyd@34.45.239.220
+   ```
+
+2. Stop all existing Node processes:
+   ```
+   sudo pkill -9 -f node
+   ```
+
+3. Install required packages:
+   ```
+   sudo apt update
+   sudo apt install -y chromium-browser
+   ```
+
+4. Set up the Puppeteer configuration:
+   ```
+   mkdir -p /home/applegraphicshyd/Onnrides-WhatsApp/src/config
+   ```
+
+5. Create a Puppeteer configuration file:
+   ```
+   cat > /home/applegraphicshyd/Onnrides-WhatsApp/src/config/puppeteer.config.js << 'EOL'
+   module.exports = {
+     headless: true,
+     args: [
+       '--no-sandbox',
+       '--disable-setuid-sandbox',
+       '--disable-dev-shm-usage',
+       '--disable-gpu',
+       '--disable-accelerated-2d-canvas',
+       '--no-first-run',
+       '--no-zygote',
+       '--single-process',
+       '--disable-notifications',
+       '--window-size=1280,720',
+       '--window-position=0,0',
+       '--ignore-certificate-errors',
+       '--ignore-certificate-errors-spki-list',
+       '--allow-running-insecure-content',
+       '--disable-web-security',
+       '--disable-features=site-per-process',
+       '--disable-features=IsolateOrigins',
+       '--disable-site-isolation-trials'
+     ],
+     defaultViewport: {
+       width: 1280,
+       height: 720
+     },
+     ignoreHTTPSErrors: true,
+     timeout: 0,
+     pipe: true
+   };
+   EOL
+   ```
+
+6. Update the WhatsApp manager code to use the configuration file:
+   ```
+   cd /home/applegraphicshyd/Onnrides-WhatsApp/src
+   sed -i '5a const puppeteerConfig = require("./config/puppeteer.config");' whatsapp-manager.js
+   sed -i 's|puppeteer: {|puppeteer: {\n      ...puppeteerConfig,|g' whatsapp-manager.js
+   ```
+
+7. Clean up the session data:
+   ```
+   rm -rf /home/applegraphicshyd/Onnrides-WhatsApp/.wwebjs_auth/*
+   mkdir -p /home/applegraphicshyd/Onnrides-WhatsApp/.wwebjs_auth
+   ```
+
+8. Fix permissions:
+   ```
+   sudo chown -R applegraphicshyd:applegraphicshyd /home/applegraphicshyd/Onnrides-WhatsApp/
+   ```
+
+9. Start the server in foreground to see the QR code:
+   ```
+   cd /home/applegraphicshyd/Onnrides-WhatsApp
+   node src/server.js
+   ```
+
+10. When you see the QR code, scan it with your WhatsApp phone app:
+    - Open WhatsApp on your phone
+    - Tap Menu or Settings and select Linked Devices
+    - Tap on "Link a Device"
+    - Scan the QR code displayed in the terminal
+
+11. After scanning, press CTRL+C to stop the process and start it with PM2:
+    ```
+    pm2 start src/server.js --name whatsapp-api
+    ```
+
+12. Check the logs:
+    ```
+    pm2 logs whatsapp-api
+    ```
+
+If the QR code doesn't appear or you have issues, you can also try:
+
+1. Use a custom qr-helper.js script:
+   ```
+   cd /home/applegraphicshyd/Onnrides-WhatsApp
+   cat > qr-helper.js << 'EOL'
+   // WhatsApp QR Code Generator Helper
+   const { Client, LocalAuth } = require('whatsapp-web.js');
+   const qrcode = require('qrcode-terminal');
+   const fs = require('fs');
+   const path = require('path');
+   
+   console.log('Starting WhatsApp QR code generator...');
+   
+   // Puppeteer configuration
+   const puppeteerConfig = {
+     headless: true,
+     args: [
+       '--no-sandbox',
+       '--disable-setuid-sandbox',
+       '--disable-dev-shm-usage',
+       '--disable-gpu',
+       '--no-first-run',
+       '--no-zygote',
+       '--disable-notifications',
+       '--window-size=1280,720'
+     ],
+     defaultViewport: null
+   };
+   
+   // Create client with improved options
+   const client = new Client({
+     puppeteer: puppeteerConfig,
+     authStrategy: new LocalAuth({
+       clientId: 'instance1',
+       dataPath: path.join(__dirname, '.wwebjs_auth')
+     }),
+     qrMaxRetries: 5
+   });
+   
+   // Handle QR code generation
+   client.on('qr', (qr) => {
+     console.log('\n\n===== WHATSAPP QR CODE =====\n');
+     qrcode.generate(qr, { small: false });
+     console.log('\n===== SCAN THIS QR CODE WITH YOUR PHONE =====');
+     console.log('QR Code string:', qr);
+     
+     // Also save to file
+     fs.writeFileSync('whatsapp_qr.txt', qr);
+     console.log('\nQR code also saved to whatsapp_qr.txt');
+   });
+   
+   // Handle authentication
+   client.on('authenticated', () => {
+     console.log('AUTHENTICATED SUCCESSFULLY!');
+   });
+   
+   // Initialize client
+   console.log('Initializing client...');
+   client.initialize();
+   EOL
+   ```
+
+2. Run the helper script:
+   ```
+   node qr-helper.js
+   ```
+
+These steps should fix your WhatsApp API server and allow you to properly authenticate with WhatsApp. 

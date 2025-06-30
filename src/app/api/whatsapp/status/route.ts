@@ -22,10 +22,10 @@ export async function GET() {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-
+    
     const data = await response.json();
     console.log('[Frontend API] WhatsApp status response:', data);
-
+    
     return NextResponse.json(data);
   } catch (error) {
     console.error('[Frontend API] Error getting WhatsApp status:', error);
