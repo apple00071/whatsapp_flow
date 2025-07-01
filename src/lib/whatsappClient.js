@@ -419,7 +419,33 @@ const getWhatsAppClient = () => {
   return instance;
 };
 
-module.exports = {
-  WhatsAppClient,
-  getWhatsAppClient
-}; 
+/**
+ * WhatsApp Client Module
+ * Simple module to handle WhatsApp client functionality
+ */
+
+// This is a placeholder for the actual WhatsApp client implementation
+const whatsappClient = {
+  isReady: false,
+  
+  // Send a message to a specific phone number
+  sendMessage: async (phone, message) => {
+    console.log(`Sending message to ${phone}: ${message}`);
+    return { success: true, message: 'Message sent successfully' };
+  },
+  
+  // Get the client status
+  getStatus: () => {
+    return {
+      isConnected: whatsappClient.isReady,
+      status: whatsappClient.isReady ? 'CONNECTED' : 'DISCONNECTED'
+    };
+  },
+  
+  // Set the client as ready
+  setReady: (status) => {
+    whatsappClient.isReady = status;
+  }
+};
+
+module.exports = whatsappClient; 

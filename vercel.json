@@ -5,7 +5,8 @@
   "outputDirectory": ".next",
   "framework": "nextjs",
   "env": {
-    "NEXT_PUBLIC_API_URL": "http://34.45.239.220:3001",
-    "BACKEND_URL": "http://34.45.239.220:3001"
+    "NEXT_PUBLIC_API_URL": "http://34.59.26.51:3002",
+    "BACKEND_URL": "http://34.59.26.51:3002",
+    "QR_API_URL": "http://34.59.26.51:3003"
   }
 } 

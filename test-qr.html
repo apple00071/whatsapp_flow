@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .qr-container {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .qr-image {
+            max-width: 300px;
+            max-height: 300px;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>QR Code Test</h1>
+    
+    <button id="fetchQr">Fetch QR Code</button>
+    <p id="status">Status: Ready</p>
+    
+    <div class="qr-container">
+        <h2>QR Code Image</h2>
+        <div id="qrDisplay">No QR code fetched yet</div>
+    </div>
+    
+    <h2>Response Data</h2>
+    <pre id="responseData">No data yet</pre>
+    
+    <script>
+        document.getElementById('fetchQr').addEventListener('click', async () => {
+            const statusEl = document.getElementById('status');
+            const qrDisplayEl = document.getElementById('qrDisplay');
+            const responseDataEl = document.getElementById('responseData');
+            
+            try {
+                statusEl.textContent = 'Status: Fetching...';
+                
+                // Add timestamp to prevent caching
+                const timestamp = Date.now();
+                const response = await fetch(`http://34.59.26.51:3003/api/whatsapp/qr?t=${timestamp}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                statusEl.textContent = `Status: Response received (${response.status})`;
+                
+                const data = await response.json();
+                responseDataEl.textContent = JSON.stringify(data, null, 2);
+                
+                if (data.success && data.qrCode) {
+                    const img = document.createElement('img');
+                    img.src = data.qrCode;
+                    img.alt = 'WhatsApp QR Code';
+                    img.className = 'qr-image';
+                    
+                    qrDisplayEl.innerHTML = '';
+                    qrDisplayEl.appendChild(img);
+                    
+                    statusEl.textContent = 'Status: QR code loaded successfully';
+                } else {
+                    qrDisplayEl.innerHTML = 'Failed to load QR code';
+                    statusEl.textContent = `Status: Error - ${data.error || 'Unknown error'}`;
+                }
+            } catch (error) {
+                statusEl.textContent = `Status: Error - ${error.message}`;
+                responseDataEl.textContent = error.toString();
+                qrDisplayEl.innerHTML = 'Error loading QR code';
+                console.error('Error fetching QR code:', error);
+            }
+        });
+    </script>
+</body>
+</html> 

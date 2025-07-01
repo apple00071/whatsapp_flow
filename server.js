@@ -358,6 +358,42 @@ app.post('/api/templates', async (req, res) => {
   }
 });
 
+// Authentication endpoints
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required' });
+    }
+    
+    const users = await loadUsers();
+    const user = users.find(u => u.email === email && u.password === password);
+    
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+    
+    // Create JWT token
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: user.role },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+    
+    // Don't send password to client
+    const { password: _, ...userWithoutPassword } = user;
+    
+    res.json({
+      token,
+      user: userWithoutPassword
+    });
+  } catch (error) {
+    console.error('Error during login:', error);
+    res.status(500).json({ message: 'An error occurred during login' });
+  }
+});
+
 // Start the server
 app.listen(PORT, '0.0.0.0', (err) => {
   if (err) {

@@ -6,7 +6,7 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://34.45.239.220:3001/api/:path*',
+        destination: process.env.BACKEND_URL || 'http://34.45.239.220:3001/api/:path*',
       },
     ];
   },

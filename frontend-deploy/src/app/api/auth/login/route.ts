@@ -1,30 +1,56 @@
 import { NextResponse } from 'next/server';
+import { sign } from 'jsonwebtoken';
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3001';
+const JWT_SECRET = process.env.JWT_SECRET || 'whatsapp-flow-secret-key';
+
+// Default admin user for authentication
+const defaultUsers = [
+  {
+    id: '1',
+    email: 'applegraphicshyd@gmail.com',
+    password: 'Admin@123456',
+    name: 'Admin',
+    role: 'admin',
+    createdAt: new Date().toISOString()
+  }
+];
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
+    const { email, password } = body;
     
-    // Forward the login request to the backend server
-    const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
+    if (!email || !password) {
       return NextResponse.json(
-        { message: data.message || 'Login failed' },
-        { status: response.status }
+        { message: 'Email and password are required' },
+        { status: 400 }
       );
     }
 
-    return NextResponse.json(data);
+    // Find user with matching credentials
+    const user = defaultUsers.find(u => u.email === email && u.password === password);
+    
+    if (!user) {
+      return NextResponse.json(
+        { message: 'Invalid email or password' },
+        { status: 401 }
+      );
+    }
+
+    // Create JWT token
+    const token = sign(
+      { id: user.id, email: user.email, role: user.role },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+    
+    // Don't send password to client
+    const { password: _, ...userWithoutPassword } = user;
+    
+    return NextResponse.json({
+      token,
+      user: userWithoutPassword
+    });
   } catch (error) {
     console.error('Login error:', error);
     return NextResponse.json(

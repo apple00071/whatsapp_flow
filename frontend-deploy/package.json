@@ -14,11 +14,13 @@
   "type": "commonjs",
   "dependencies": {
     "@types/bull": "^3.15.9",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/puppeteer": "^5.4.7",
     "axios": "^1.10.0",
     "bull": "^4.16.5",
     "date-fns": "^4.1.0",
     "js-cookie": "^3.0.5",
+    "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.525.0",
     "next": "14.0.0",
     "papaparse": "^5.5.3",
