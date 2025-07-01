@@ -1,4 +1,4 @@
-const { RateLimiterMemory } = require('rate-limiter-flexible');
+import { RateLimiterMemory } from 'rate-limiter-flexible';
 
 // Configure different limiters based on WhatsApp's limits
 // Single message rate limiter - 30 messages per minute
@@ -22,8 +22,14 @@ const dailyLimiter = new RateLimiterMemory({
   blockDuration: 86400 // Block for a day if exceeded
 });
 
+interface RateLimitResult {
+  success: boolean;
+  error?: string;
+  msBeforeNext?: number;
+}
+
 // Consume points from multiple limiters at once
-const consumeRateLimits = async (key, points = 1) => {
+export const consumeRateLimits = async (key: string, points = 1): Promise<RateLimitResult> => {
   try {
     // Try to consume points from all limiters
     await Promise.all([
@@ -32,7 +38,7 @@ const consumeRateLimits = async (key, points = 1) => {
       dailyLimiter.consume(key, points)
     ]);
     return { success: true };
-  } catch (error) {
+  } catch (error: any) {
     // One of the limiters rejected
     return { 
       success: false, 
@@ -42,9 +48,8 @@ const consumeRateLimits = async (key, points = 1) => {
   }
 };
 
-module.exports = {
+export {
   messageLimiter,
   bulkLimiter,
-  dailyLimiter,
-  consumeRateLimits
+  dailyLimiter
 }; 

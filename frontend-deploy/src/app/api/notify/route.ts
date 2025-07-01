@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
-import { consumeRateLimits } from '@/lib/rateLimiter';
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3001';
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'http://34.45.239.220:3001';
 
 export async function POST(req: Request) {
   try {
@@ -15,20 +14,9 @@ export async function POST(req: Request) {
       );
     }
 
-    // Check rate limits first
+    // Get client IP for rate limiting
     const ip = req.headers.get('x-forwarded-for') || 'unknown';
-    const rateLimitResult = await consumeRateLimits(ip);
     
-    if (!rateLimitResult.success) {
-      const timeToWait = rateLimitResult.msBeforeNext ? 
-        Math.ceil(rateLimitResult.msBeforeNext / 1000) : 60;
-      
-      return NextResponse.json(
-        { error: `Rate limit exceeded. Try again in ${timeToWait} seconds.` },
-        { status: 429 }
-      );
-    }
-
     // Send message through backend server
     const response = await fetch(`${BACKEND_URL}/api/whatsapp/send`, {
       method: 'POST',

@@ -21,14 +21,6 @@ const writeFile = promisify(fs.writeFile);
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-// Type augmentation for whatsapp-web.js Client options
-declare module 'whatsapp-web.js' {
-  interface PuppeteerOptions {
-    browser?: puppeteer.Browser;
-    defaultViewport?: puppeteer.Viewport | null;
-  }
-}
-
 /**
  * WhatsApp client wrapper using whatsapp-web.js
  */
@@ -44,7 +36,7 @@ export class WhatsAppClient {
   private connectionRetries: number = 0;
   private readonly MAX_RETRIES: number = 3;
   private isShuttingDown: boolean = false;
-  private browser: puppeteer.Browser | null = null;
+  private browser: any | null = null;
   private messageCount: number = 0;
   private lastMessageTime: Date = new Date();
 
