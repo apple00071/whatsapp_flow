@@ -1,6 +1,6 @@
 /**
  * Database configuration for Sequelize ORM
- * Handles PostgreSQL connection and model synchronization
+ * Handles Supabase PostgreSQL connection and model synchronization
  */
 
 const { Sequelize } = require('sequelize');
@@ -8,10 +8,17 @@ const config = require('./index');
 const logger = require('../utils/logger');
 
 /**
- * Initialize Sequelize instance with configuration
+ * Initialize Sequelize instance with Supabase configuration
+ * Supabase uses PostgreSQL, so we use the 'postgres' dialect
  */
 const sequelize = new Sequelize(config.database.url, {
   dialect: 'postgres',
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false, // Required for Supabase
+    },
+  },
   logging: config.database.logging ? (msg) => logger.debug(msg) : false,
   pool: {
     min: config.database.pool.min,
