@@ -1,0 +1,219 @@
+/**
+ * API Key Redux Slice
+ * Handles API key state
+ */
+
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import api from '../../services/api';
+
+// Initial state
+const initialState = {
+  apiKeys: [],
+  currentApiKey: null,
+  newApiKey: null, // Store newly created/regenerated key (shown only once)
+  stats: null,
+  loading: false,
+  error: null,
+};
+
+// Async thunks
+export const fetchApiKeys = createAsyncThunk(
+  'apiKeys/fetchAll',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get('/api-keys');
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.error || 'Failed to fetch API keys');
+    }
+  }
+);
+
+export const getApiKey = createAsyncThunk(
+  'apiKeys/getOne',
+  async (apiKeyId, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`/api-keys/${apiKeyId}`);
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.error || 'Failed to fetch API key');
+    }
+  }
+);
+
+export const createApiKey = createAsyncThunk(
+  'apiKeys/create',
+  async (apiKeyData, { rejectWithValue }) => {
+    try {
+      const response = await api.post('/api-keys', apiKeyData);
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.error || 'Failed to create API key');
+    }
+  }
+);
+
+export const updateApiKey = createAsyncThunk(
+  'apiKeys/update',
+  async ({ apiKeyId, data }, { rejectWithValue }) => {
+    try {
+      const response = await api.put(`/api-keys/${apiKeyId}`, data);
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.error || 'Failed to update API key');
+    }
+  }
+);
+
+export const deleteApiKey = createAsyncThunk(
+  'apiKeys/delete',
+  async (apiKeyId, { rejectWithValue }) => {
+    try {
+      await api.delete(`/api-keys/${apiKeyId}`);
+      return apiKeyId;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.error || 'Failed to delete API key');
+    }
+  }
+);
+
+export const revokeApiKey = createAsyncThunk(
+  'apiKeys/revoke',
+  async (apiKeyId, { rejectWithValue }) => {
+    try {
+      const response = await api.post(`/api-keys/${apiKeyId}/revoke`);
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.error || 'Failed to revoke API key');
+    }
+  }
+);
+
+export const regenerateApiKey = createAsyncThunk(
+  'apiKeys/regenerate',
+  async (apiKeyId, { rejectWithValue }) => {
+    try {
+      const response = await api.post(`/api-keys/${apiKeyId}/regenerate`);
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.error || 'Failed to regenerate API key');
+    }
+  }
+);
+
+export const getApiKeyStats = createAsyncThunk(
+  'apiKeys/getStats',
+  async (apiKeyId, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`/api-keys/${apiKeyId}/stats`);
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.error || 'Failed to fetch API key stats');
+    }
+  }
+);
+
+// Slice
+const apiKeySlice = createSlice({
+  name: 'apiKeys',
+  initialState,
+  reducers: {
+    clearError: (state) => {
+      state.error = null;
+    },
+    clearNewApiKey: (state) => {
+      state.newApiKey = null;
+    },
+    setCurrentApiKey: (state, action) => {
+      state.currentApiKey = action.payload;
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      // Fetch API keys
+      .addCase(fetchApiKeys.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchApiKeys.fulfilled, (state, action) => {
+        state.loading = false;
+        state.apiKeys = action.payload;
+      })
+      .addCase(fetchApiKeys.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Get API key
+      .addCase(getApiKey.fulfilled, (state, action) => {
+        state.currentApiKey = action.payload;
+      })
+      // Create API key
+      .addCase(createApiKey.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createApiKey.fulfilled, (state, action) => {
+        state.loading = false;
+        state.apiKeys.push(action.payload.apiKey);
+        state.newApiKey = action.payload.key; // Store the actual key (shown only once)
+        state.currentApiKey = action.payload.apiKey;
+      })
+      .addCase(createApiKey.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Update API key
+      .addCase(updateApiKey.fulfilled, (state, action) => {
+        const index = state.apiKeys.findIndex(k => k.id === action.payload.id);
+        if (index !== -1) {
+          state.apiKeys[index] = action.payload;
+        }
+        if (state.currentApiKey?.id === action.payload.id) {
+          state.currentApiKey = action.payload;
+        }
+      })
+      // Delete API key
+      .addCase(deleteApiKey.fulfilled, (state, action) => {
+        state.apiKeys = state.apiKeys.filter(k => k.id !== action.payload);
+        if (state.currentApiKey?.id === action.payload) {
+          state.currentApiKey = null;
+        }
+      })
+      // Revoke API key
+      .addCase(revokeApiKey.fulfilled, (state, action) => {
+        const index = state.apiKeys.findIndex(k => k.id === action.payload.id);
+        if (index !== -1) {
+          state.apiKeys[index] = action.payload;
+        }
+        if (state.currentApiKey?.id === action.payload.id) {
+          state.currentApiKey = action.payload;
+        }
+      })
+      // Regenerate API key
+      .addCase(regenerateApiKey.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(regenerateApiKey.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.apiKeys.findIndex(k => k.id === action.payload.apiKey.id);
+        if (index !== -1) {
+          state.apiKeys[index] = action.payload.apiKey;
+        }
+        state.newApiKey = action.payload.key; // Store the new key (shown only once)
+        state.currentApiKey = action.payload.apiKey;
+      })
+      .addCase(regenerateApiKey.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Get API key stats
+      .addCase(getApiKeyStats.fulfilled, (state, action) => {
+        state.stats = action.payload;
+      });
+  },
+});
+
+export const { clearError, clearNewApiKey, setCurrentApiKey } = apiKeySlice.actions;
+export default apiKeySlice.reducer;
+

@@ -1,0 +1,39 @@
+{
+  "name": "@whatsapp-platform/sdk",
+  "version": "1.0.0",
+  "description": "Official Node.js SDK for WhatsApp Programmable Messaging Platform",
+  "main": "src/index.js",
+  "types": "types/index.d.ts",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "lint": "eslint src/**/*.js",
+    "lint:fix": "eslint src/**/*.js --fix"
+  },
+  "keywords": [
+    "whatsapp",
+    "api",
+    "sdk",
+    "messaging",
+    "automation"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/whatsapp-api-platform.git",
+    "directory": "sdks/nodejs-sdk"
+  },
+  "dependencies": {
+    "axios": "^1.6.2",
+    "form-data": "^4.0.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "eslint": "^8.55.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
+
