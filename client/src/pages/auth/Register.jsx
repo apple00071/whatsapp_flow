@@ -58,9 +58,16 @@ export default function Register() {
       return;
     }
 
-    const { confirmPassword, ...registerData } = formData;
+    // Convert camelCase to snake_case for backend API
+    const registerData = {
+      first_name: formData.firstName,
+      last_name: formData.lastName,
+      email: formData.email,
+      password: formData.password,
+    };
+
     const result = await dispatch(register(registerData));
-    
+
     if (!result.error) {
       navigate('/dashboard');
     }

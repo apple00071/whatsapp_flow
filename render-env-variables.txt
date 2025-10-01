@@ -1,0 +1,95 @@
+# RENDER.COM ENVIRONMENT VARIABLES
+# Copy and paste these into Render dashboard
+# Replace YOUR_ACTUAL_SUPABASE_PASSWORD_HERE with your real password
+
+NODE_ENV=production
+PORT=10000
+API_VERSION=v1
+
+# Supabase Configuration
+SUPABASE_URL=https://frifbegpqtxllisfmfmw.supabase.co
+SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyaWZiZWdwcXR4bGxpc2ZtZm13Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNTI2NzAsImV4cCI6MjA3NDgyODY3MH0.qccbNgLHBzpx8gqPuB7Vdr9Ditmvd5kHxFvBmS1qj_M
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyaWZiZWdwcXR4bGxpc2ZtZm13Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTI1MjY3MCwiZXhwIjoyMDc0ODI4NjcwfQ.u5s6MmlpsiIgMFJu2y-nws8u1sXYqqvkFx1np1D1CeA
+
+# Database Configuration - REPLACE PASSWORD!
+DB_HOST=db.frifbegpqtxllisfmfmw.supabase.co
+DB_PORT=5432
+DB_NAME=postgres
+DB_USER=postgres
+DB_PASSWORD=YOUR_ACTUAL_SUPABASE_PASSWORD_HERE
+DATABASE_URL=postgresql://postgres:YOUR_ACTUAL_SUPABASE_PASSWORD_HERE@db.frifbegpqtxllisfmfmw.supabase.co:5432/postgres
+DB_POOL_MIN=2
+DB_POOL_MAX=10
+
+# Redis Configuration (Render auto-sets REDIS_URL)
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=
+REDIS_DB=0
+
+# JWT Configuration
+JWT_SECRET=whatsapp-api-super-secret-jwt-key-production-2024-min-32-chars
+JWT_EXPIRES_IN=7d
+REFRESH_TOKEN_SECRET=whatsapp-api-refresh-token-secret-production-2024-min-32-chars
+REFRESH_TOKEN_EXPIRES_IN=30d
+
+# WhatsApp Configuration
+WHATSAPP_SESSION_PATH=./sessions
+WHATSAPP_MAX_SESSIONS=50
+WHATSAPP_TIMEOUT=60000
+WHATSAPP_RETRY_ATTEMPTS=3
+
+# Media Storage
+MEDIA_STORAGE_TYPE=local
+MEDIA_UPLOAD_PATH=./uploads
+MEDIA_MAX_SIZE=52428800
+MEDIA_ALLOWED_TYPES=image/jpeg,image/png,image/gif,video/mp4,audio/mpeg,application/pdf
+
+# Rate Limiting
+RATE_LIMIT_WINDOW_MS=60000
+RATE_LIMIT_MAX_REQUESTS=100
+RATE_LIMIT_SKIP_SUCCESSFUL_REQUESTS=false
+
+# Webhook Configuration
+WEBHOOK_RETRY_ATTEMPTS=3
+WEBHOOK_RETRY_DELAY=1000
+WEBHOOK_TIMEOUT=10000
+WEBHOOK_SECRET=whatsapp-webhook-secret-production-2024-change-this
+
+# CORS Configuration - CRITICAL!
+CORS_ORIGIN=https://dist-16ndbi419-apple00071s-projects.vercel.app
+CORS_CREDENTIALS=true
+
+# Email Configuration
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=false
+EMAIL_FROM=noreply@whatsapp-api.com
+EMAIL_FROM_NAME=WhatsApp API Platform
+
+# Logging
+LOG_LEVEL=info
+LOG_FILE_PATH=./logs
+LOG_MAX_SIZE=10m
+LOG_MAX_FILES=14d
+
+# Session Configuration
+SESSION_SECRET=whatsapp-session-secret-production-2024-change-this
+SESSION_MAX_AGE=86400000
+
+# Queue Configuration
+QUEUE_CONCURRENCY=5
+
+# Monitoring
+ENABLE_METRICS=true
+METRICS_PORT=9090
+
+# Security
+BCRYPT_ROUNDS=10
+MAX_LOGIN_ATTEMPTS=5
+LOCK_TIME=900000
+
+# Feature Flags
+ENABLE_WEBHOOKS=true
+ENABLE_EMAIL_VERIFICATION=false
+ENABLE_TWO_FACTOR_AUTH=false
