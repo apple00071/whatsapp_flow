@@ -58,7 +58,7 @@ WEBHOOK_TIMEOUT=10000
 WEBHOOK_SECRET=whatsapp-webhook-secret-production-2024-change-this
 
 # CORS Configuration - CRITICAL!
-CORS_ORIGIN=https://dist-16ndbi419-apple00071s-projects.vercel.app
+CORS_ORIGIN=https://dist-eta-sooty.vercel.app
 CORS_CREDENTIALS=true
 
 # Email Configuration

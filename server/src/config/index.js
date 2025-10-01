@@ -106,7 +106,7 @@ const config = {
   
   // CORS Configuration
   cors: {
-    origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:5173'],
+    origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:5173', 'https://dist-eta-sooty.vercel.app'],
     credentials: process.env.CORS_CREDENTIALS === 'true',
   },
   
