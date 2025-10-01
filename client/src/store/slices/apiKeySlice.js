@@ -137,7 +137,8 @@ const apiKeySlice = createSlice({
       })
       .addCase(fetchApiKeys.fulfilled, (state, action) => {
         state.loading = false;
-        state.apiKeys = action.payload;
+        // Ensure apiKeys is always an array
+        state.apiKeys = Array.isArray(action.payload) ? action.payload : [];
       })
       .addCase(fetchApiKeys.rejected, (state, action) => {
         state.loading = false;

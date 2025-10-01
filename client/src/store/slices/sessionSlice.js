@@ -143,8 +143,9 @@ const sessionSlice = createSlice({
       })
       .addCase(fetchSessions.fulfilled, (state, action) => {
         state.loading = false;
-        state.sessions = action.payload.sessions;
-        state.pagination = action.payload.pagination;
+        // Ensure sessions is always an array
+        state.sessions = Array.isArray(action.payload.sessions) ? action.payload.sessions : [];
+        state.pagination = action.payload.pagination || {};
       })
       .addCase(fetchSessions.rejected, (state, action) => {
         state.loading = false;

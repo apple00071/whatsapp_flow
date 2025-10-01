@@ -140,7 +140,7 @@ const ApiKeys = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {apiKeys.map((apiKey) => (
+            {Array.isArray(apiKeys) && apiKeys.map((apiKey) => (
               <TableRow key={apiKey.id}>
                 <TableCell>{apiKey.name}</TableCell>
                 <TableCell>

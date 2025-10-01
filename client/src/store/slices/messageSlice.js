@@ -139,8 +139,9 @@ const messageSlice = createSlice({
       })
       .addCase(fetchMessages.fulfilled, (state, action) => {
         state.loading = false;
-        state.messages = action.payload.messages;
-        state.pagination = action.payload.pagination;
+        // Ensure messages is always an array
+        state.messages = Array.isArray(action.payload.messages) ? action.payload.messages : [];
+        state.pagination = action.payload.pagination || {};
       })
       .addCase(fetchMessages.rejected, (state, action) => {
         state.loading = false;

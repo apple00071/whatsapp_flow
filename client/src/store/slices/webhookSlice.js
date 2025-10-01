@@ -151,7 +151,8 @@ const webhookSlice = createSlice({
       })
       .addCase(fetchWebhooks.fulfilled, (state, action) => {
         state.loading = false;
-        state.webhooks = action.payload;
+        // Ensure webhooks is always an array
+        state.webhooks = Array.isArray(action.payload) ? action.payload : [];
       })
       .addCase(fetchWebhooks.rejected, (state, action) => {
         state.loading = false;
@@ -220,7 +221,8 @@ const webhookSlice = createSlice({
       })
       .addCase(fetchWebhookLogs.fulfilled, (state, action) => {
         state.loading = false;
-        state.logs = action.payload.logs;
+        // Ensure logs is always an array
+        state.logs = Array.isArray(action.payload.logs) ? action.payload.logs : [];
       })
       .addCase(fetchWebhookLogs.rejected, (state, action) => {
         state.loading = false;

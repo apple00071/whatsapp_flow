@@ -127,7 +127,7 @@ const Sessions = () => {
       )}
 
       <Grid container spacing={3}>
-        {sessions.map((session) => (
+        {Array.isArray(sessions) && sessions.map((session) => (
           <Grid item xs={12} sm={6} md={4} key={session.id}>
             <Card>
               <CardContent>

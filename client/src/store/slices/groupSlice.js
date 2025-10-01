@@ -147,8 +147,9 @@ const groupSlice = createSlice({
       })
       .addCase(fetchGroups.fulfilled, (state, action) => {
         state.loading = false;
-        state.groups = action.payload.groups;
-        state.pagination = action.payload.pagination;
+        // Ensure groups is always an array
+        state.groups = Array.isArray(action.payload.groups) ? action.payload.groups : [];
+        state.pagination = action.payload.pagination || {};
       })
       .addCase(fetchGroups.rejected, (state, action) => {
         state.loading = false;

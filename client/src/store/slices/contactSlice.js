@@ -151,8 +151,9 @@ const contactSlice = createSlice({
       })
       .addCase(fetchContacts.fulfilled, (state, action) => {
         state.loading = false;
-        state.contacts = action.payload.contacts;
-        state.pagination = action.payload.pagination;
+        // Ensure contacts is always an array
+        state.contacts = Array.isArray(action.payload.contacts) ? action.payload.contacts : [];
+        state.pagination = action.payload.pagination || {};
       })
       .addCase(fetchContacts.rejected, (state, action) => {
         state.loading = false;
