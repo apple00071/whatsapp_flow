@@ -1,0 +1,24 @@
+# Ignore Dockerfile - we're deploying backend only, not using Docker
+Dockerfile
+Dockerfile.dev
+
+# Ignore client directory - frontend is deployed separately on Vercel
+client/
+
+# Ignore documentation
+*.md
+docs/
+
+# Ignore git files
+.git/
+.gitignore
+
+# Ignore IDE files
+.vscode/
+.idea/
+
+# Ignore test files
+**/*.test.js
+**/*.spec.js
+__tests__/
+
