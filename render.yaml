@@ -33,9 +33,9 @@ services:
       - key: DB_USER
         value: postgres
       - key: DB_PASSWORD
-        sync: false  # Set manually in Render dashboard
+        value: hC6gdcJ$fr*$PUv
       - key: DATABASE_URL
-        sync: false  # Set manually in Render dashboard
+        value: postgresql://postgres:hC6gdcJ$fr*$PUv@db.frifbegpqtxllisfmfmw.supabase.co:5432/postgres
       - key: DB_POOL_MIN
         value: 2
       - key: DB_POOL_MAX
