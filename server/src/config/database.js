@@ -70,14 +70,13 @@ if (config.database.url) {
 
     // Extract connection details from URL
     const host = dbUrl.hostname;
-    // Use Supabase connection pooler (6543) instead of direct connection (5432)
-    // The pooler may have better IPv4 support
-    const port = dbUrl.port === '5432' ? 6543 : (dbUrl.port || 6543);
+    // Use standard PostgreSQL port for Neon (5432) instead of connection pooler
+    const port = parseInt(dbUrl.port) || 5432;
     const database = dbUrl.pathname.slice(1); // Remove leading '/'
     const username = dbUrl.username;
     const password = decodeURIComponent(dbUrl.password); // Decode URL-encoded password
 
-    logger.info(`Connecting to database: ${host}:${port}/${database} (using connection pooler)`);
+    logger.info(`Connecting to database: ${host}:${port}/${database}`);
 
     sequelizeConfig = {
       host,
@@ -89,12 +88,14 @@ if (config.database.url) {
       dialectOptions: {
         ssl: {
           require: true,
-          rejectUnauthorized: false, // Required for Supabase
+          rejectUnauthorized: false, // Required for cloud databases
         },
-        // Connection timeout settings
+        // Additional connection settings for better compatibility
         connectTimeout: 60000, // 60 seconds
         keepAlive: true,
         keepAliveInitialDelayMillis: 10000,
+        // Force IPv4 family for Render compatibility
+        family: 4,
       },
       logging: config.database.logging ? (msg) => logger.debug(msg) : false,
       pool: {
