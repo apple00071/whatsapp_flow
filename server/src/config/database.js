@@ -10,9 +10,26 @@ const pg = require('pg');
 const config = require('./index');
 const logger = require('../utils/logger');
 
+// AGGRESSIVE IPv4-ONLY CONFIGURATION
 // Force IPv4 DNS resolution to avoid ENETUNREACH errors
 // Render.com may not support IPv6 connectivity to Supabase
 dns.setDefaultResultOrder('ipv4first');
+
+// Override DNS lookup to return only IPv4 addresses
+const originalLookup = dns.lookup;
+dns.lookup = function(hostname, options, callback) {
+  if (typeof options === 'function') {
+    callback = options;
+    options = {};
+  }
+  options = options || {};
+
+  // Force IPv4 family
+  options.family = 4;
+
+  logger.info(`DNS lookup for ${hostname} - forcing IPv4 only`);
+  return originalLookup.call(this, hostname, options, callback);
+};
 
 /**
  * Custom connection function that forces IPv4
@@ -53,12 +70,14 @@ if (config.database.url) {
 
     // Extract connection details from URL
     const host = dbUrl.hostname;
-    const port = dbUrl.port || 5432;
+    // Use Supabase connection pooler (6543) instead of direct connection (5432)
+    // The pooler may have better IPv4 support
+    const port = dbUrl.port === '5432' ? 6543 : (dbUrl.port || 6543);
     const database = dbUrl.pathname.slice(1); // Remove leading '/'
     const username = dbUrl.username;
     const password = decodeURIComponent(dbUrl.password); // Decode URL-encoded password
 
-    logger.info(`Connecting to database: ${host}:${port}/${database}`);
+    logger.info(`Connecting to database: ${host}:${port}/${database} (using connection pooler)`);
 
     sequelizeConfig = {
       host,
