@@ -1,0 +1,160 @@
+services:
+  # Backend API Service
+  - type: web
+    name: whatsapp-api-backend
+    env: node
+    plan: free
+    buildCommand: cd server && npm install
+    startCommand: cd server && npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: API_VERSION
+        value: v1
+      
+      # Supabase Configuration
+      - key: SUPABASE_URL
+        value: https://frifbegpqtxllisfmfmw.supabase.co
+      - key: SUPABASE_ANON_KEY
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyaWZiZWdwcXR4bGxpc2ZtZm13Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyNTI2NzAsImV4cCI6MjA3NDgyODY3MH0.qccbNgLHBzpx8gqPuB7Vdr9Ditmvd5kHxFvBmS1qj_M
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyaWZiZWdwcXR4bGxpc2ZtZm13Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTI1MjY3MCwiZXhwIjoyMDc0ODI4NjcwfQ.u5s6MmlpsiIgMFJu2y-nws8u1sXYqqvkFx1np1D1CeA
+      
+      # Database Configuration
+      - key: DB_HOST
+        value: db.frifbegpqtxllisfmfmw.supabase.co
+      - key: DB_PORT
+        value: 5432
+      - key: DB_NAME
+        value: postgres
+      - key: DB_USER
+        value: postgres
+      - key: DB_PASSWORD
+        sync: false  # Set manually in Render dashboard
+      - key: DATABASE_URL
+        sync: false  # Set manually in Render dashboard
+      - key: DB_POOL_MIN
+        value: 2
+      - key: DB_POOL_MAX
+        value: 10
+      
+      # JWT Configuration
+      - key: JWT_SECRET
+        value: whatsapp-api-super-secret-jwt-key-production-2024-min-32-chars
+      - key: REFRESH_TOKEN_SECRET
+        value: whatsapp-api-refresh-token-secret-production-2024-min-32-chars
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: REFRESH_TOKEN_EXPIRES_IN
+        value: 30d
+      
+      # WhatsApp Configuration
+      - key: WHATSAPP_SESSION_PATH
+        value: ./sessions
+      - key: WHATSAPP_MAX_SESSIONS
+        value: 50
+      - key: WHATSAPP_TIMEOUT
+        value: 60000
+      - key: WHATSAPP_RETRY_ATTEMPTS
+        value: 3
+      
+      # Media Storage
+      - key: MEDIA_STORAGE_TYPE
+        value: local
+      - key: MEDIA_UPLOAD_PATH
+        value: ./uploads
+      - key: MEDIA_MAX_SIZE
+        value: 52428800
+      - key: MEDIA_ALLOWED_TYPES
+        value: image/jpeg,image/png,image/gif,video/mp4,audio/mpeg,application/pdf
+      
+      # Rate Limiting
+      - key: RATE_LIMIT_WINDOW_MS
+        value: 60000
+      - key: RATE_LIMIT_MAX_REQUESTS
+        value: 100
+      - key: RATE_LIMIT_SKIP_SUCCESSFUL_REQUESTS
+        value: false
+      
+      # Webhook Configuration
+      - key: WEBHOOK_RETRY_ATTEMPTS
+        value: 3
+      - key: WEBHOOK_RETRY_DELAY
+        value: 1000
+      - key: WEBHOOK_TIMEOUT
+        value: 10000
+      - key: WEBHOOK_SECRET
+        value: whatsapp-webhook-secret-production-2024-change-this
+      
+      # CORS Configuration
+      - key: CORS_ORIGIN
+        value: https://dist-47nzlgwjt-apple00071s-projects.vercel.app
+      - key: CORS_CREDENTIALS
+        value: true
+      
+      # Email Configuration (optional)
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: 587
+      - key: SMTP_SECURE
+        value: false
+      - key: EMAIL_FROM
+        value: noreply@whatsapp-api.com
+      - key: EMAIL_FROM_NAME
+        value: WhatsApp API Platform
+      
+      # Logging
+      - key: LOG_LEVEL
+        value: info
+      - key: LOG_FILE_PATH
+        value: ./logs
+      - key: LOG_MAX_SIZE
+        value: 10m
+      - key: LOG_MAX_FILES
+        value: 14d
+      
+      # Session Configuration
+      - key: SESSION_SECRET
+        value: whatsapp-session-secret-production-2024-change-this
+      - key: SESSION_MAX_AGE
+        value: 86400000
+      
+      # Queue Configuration
+      - key: QUEUE_CONCURRENCY
+        value: 5
+      
+      # Monitoring
+      - key: ENABLE_METRICS
+        value: true
+      - key: METRICS_PORT
+        value: 9090
+      
+      # Security
+      - key: BCRYPT_ROUNDS
+        value: 10
+      - key: MAX_LOGIN_ATTEMPTS
+        value: 5
+      - key: LOCK_TIME
+        value: 900000
+      
+      # Feature Flags
+      - key: ENABLE_WEBHOOKS
+        value: true
+      - key: ENABLE_EMAIL_VERIFICATION
+        value: false
+      - key: ENABLE_TWO_FACTOR_AUTH
+        value: false
+
+  # Redis Service
+  - type: redis
+    name: whatsapp-redis
+    plan: free
+    maxmemoryPolicy: allkeys-lru
+
+databases:
+  # Note: Using external Supabase database
+  # No database configuration needed here
