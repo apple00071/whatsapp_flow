@@ -149,11 +149,16 @@ services:
       - key: ENABLE_TWO_FACTOR_AUTH
         value: false
 
-  # Redis Service
-  - type: redis
-    name: whatsapp-redis
-    plan: free
-    maxmemoryPolicy: allkeys-lru
+      # Redis Configuration - Using Redis Cloud
+      - key: REDIS_URL
+        value: redis://default:o7yWxZ0qqGR5gWqVOX8OTGXD24XROBWg@redis-13390.crce217.ap-south-1-1.ec2.redns.redis-cloud.com:13390
+
+  # Note: Using external Redis Cloud instead of Render Redis
+  # If you want to use Render Redis, uncomment below and remove REDIS_URL above
+  # - type: redis
+  #   name: whatsapp-redis
+  #   plan: free
+  #   maxmemoryPolicy: allkeys-lru
 
 databases:
   # Note: Using external Supabase database

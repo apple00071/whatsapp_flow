@@ -9,18 +9,37 @@ const logger = require('../utils/logger');
 
 /**
  * Create Redis client instance
+ * Supports both REDIS_URL and individual host/port/password configuration
  */
-const redisClient = new Redis({
-  host: config.redis.host,
-  port: config.redis.port,
-  password: config.redis.password,
-  db: config.redis.db,
-  retryStrategy: (times) => {
-    const delay = Math.min(times * 50, 2000);
-    return delay;
-  },
-  maxRetriesPerRequest: 3,
-});
+let redisClient;
+
+if (config.redis.url) {
+  // Use REDIS_URL if provided (Render.com, Redis Cloud, etc.)
+  logger.info('Connecting to Redis using REDIS_URL');
+  redisClient = new Redis(config.redis.url, {
+    retryStrategy: (times) => {
+      const delay = Math.min(times * 50, 2000);
+      return delay;
+    },
+    maxRetriesPerRequest: 3,
+    enableReadyCheck: true,
+    lazyConnect: false,
+  });
+} else {
+  // Use individual configuration
+  logger.info('Connecting to Redis using host/port configuration');
+  redisClient = new Redis({
+    host: config.redis.host,
+    port: config.redis.port,
+    password: config.redis.password,
+    db: config.redis.db,
+    retryStrategy: (times) => {
+      const delay = Math.min(times * 50, 2000);
+      return delay;
+    },
+    maxRetriesPerRequest: 3,
+  });
+}
 
 /**
  * Redis event handlers

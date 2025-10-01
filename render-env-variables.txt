@@ -21,10 +21,11 @@ DATABASE_URL=postgresql://postgres:hC6gdcJ$fr*$PUv@db.frifbegpqtxllisfmfmw.supab
 DB_POOL_MIN=2
 DB_POOL_MAX=10
 
-# Redis Configuration (Render auto-sets REDIS_URL)
-REDIS_HOST=localhost
-REDIS_PORT=6379
-REDIS_PASSWORD=
+# Redis Configuration - USE REDIS_URL (Redis Cloud)
+REDIS_URL=redis://default:o7yWxZ0qqGR5gWqVOX8OTGXD24XROBWg@redis-13390.crce217.ap-south-1-1.ec2.redns.redis-cloud.com:13390
+REDIS_HOST=redis-13390.crce217.ap-south-1-1.ec2.redns.redis-cloud.com
+REDIS_PORT=13390
+REDIS_PASSWORD=o7yWxZ0qqGR5gWqVOX8OTGXD24XROBWg
 REDIS_DB=0
 
 # JWT Configuration
