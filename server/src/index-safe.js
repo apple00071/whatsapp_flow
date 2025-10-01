@@ -243,7 +243,7 @@ async function testConnectionsAsync() {
     console.log('Database URL:', config.database.url ? 'Set (hidden)' : 'NOT SET');
     await Promise.race([
       database.testConnection(),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('Database connection timeout after 15 seconds')), 15000))
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Database connection timeout after 60 seconds')), 60000))
     ]);
     console.log('✅ Database connection successful');
 
