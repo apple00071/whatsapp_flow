@@ -6,7 +6,7 @@
   "scripts": {
     "start": "cd server && npm start",
     "dev": "cd server && npm run dev",
-    "build": "cd server && npm install",
+    "build": "echo 'Build completed - this is a monorepo'",
     "install-server": "cd server && npm install",
     "install-client": "cd client && npm install",
     "install-all": "npm run install-server && npm run install-client",
@@ -16,8 +16,7 @@
     "test": "cd server && npm test",
     "lint": "cd server && npm run lint && cd ../client && npm run lint",
     "railway:build": "cd server && npm install",
-    "railway:start": "cd server && npm start",
-    "postinstall": "cd server && npm install"
+    "railway:start": "cd server && npm start"
   },
   "engines": {
     "node": ">=18.0.0",
