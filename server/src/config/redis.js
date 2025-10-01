@@ -4,6 +4,7 @@
  */
 
 const Redis = require('ioredis');
+const { createClient } = require('redis');
 const config = require('./index');
 const logger = require('../utils/logger');
 
@@ -200,10 +201,91 @@ const cache = {
   },
 };
 
+/**
+ * Create Redis client for rate limiting (using 'redis' package)
+ * rate-limit-redis requires the 'redis' package, not 'ioredis'
+ */
+let rateLimitClient;
+
+async function createRateLimitClient() {
+  if (rateLimitClient) {
+    return rateLimitClient;
+  }
+
+  try {
+    if (config.redis.url) {
+      logger.info('Creating rate limit Redis client using REDIS_URL');
+      rateLimitClient = createClient({
+        url: config.redis.url,
+        socket: {
+          reconnectStrategy: (retries) => {
+            const delay = Math.min(retries * 50, 2000);
+            return delay;
+          },
+        },
+      });
+    } else {
+      logger.info('Creating rate limit Redis client using host/port configuration');
+      rateLimitClient = createClient({
+        socket: {
+          host: config.redis.host,
+          port: config.redis.port,
+          reconnectStrategy: (retries) => {
+            const delay = Math.min(retries * 50, 2000);
+            return delay;
+          },
+        },
+        password: config.redis.password,
+        database: config.redis.db,
+      });
+    }
+
+    // Connect the client
+    await rateLimitClient.connect();
+    logger.info('Rate limit Redis client connected');
+
+    // Error handling
+    rateLimitClient.on('error', (error) => {
+      logger.error('Rate limit Redis client error:', error);
+    });
+
+    return rateLimitClient;
+  } catch (error) {
+    logger.error('Failed to create rate limit Redis client:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get rate limit Redis client (lazy initialization)
+ */
+async function getRateLimitClient() {
+  if (!rateLimitClient) {
+    await createRateLimitClient();
+  }
+  return rateLimitClient;
+}
+
+/**
+ * Close rate limit Redis connection
+ */
+async function closeRateLimitConnection() {
+  if (rateLimitClient) {
+    try {
+      await rateLimitClient.quit();
+      logger.info('Rate limit Redis connection closed');
+    } catch (error) {
+      logger.error('Error closing rate limit Redis connection:', error);
+    }
+  }
+}
+
 module.exports = {
   redisClient,
   cache,
   testConnection,
   closeConnection,
+  getRateLimitClient,
+  closeRateLimitConnection,
 };
 

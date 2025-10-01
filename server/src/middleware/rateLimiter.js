@@ -5,12 +5,35 @@
 
 const rateLimit = require('express-rate-limit');
 const { RedisStore } = require('rate-limit-redis');
-const { redisClient } = require('../config/redis');
+const { getRateLimitClient, redisClient } = require('../config/redis');
 const config = require('../config');
 const { ApiError } = require('./errorHandler');
 
 /**
- * Create rate limiter with Redis store
+ * Rate limit Redis client (using 'redis' package, not ioredis)
+ * Initialized during server startup
+ */
+let rateLimitRedisClient = null;
+
+/**
+ * Initialize rate limit Redis client
+ * Should be called during server startup before applying middleware
+ */
+async function initRateLimitClient() {
+  if (!rateLimitRedisClient) {
+    try {
+      rateLimitRedisClient = await getRateLimitClient();
+      console.log('✅ Rate limit Redis client initialized');
+    } catch (error) {
+      console.error('❌ Failed to initialize rate limit Redis client:', error);
+      // Continue without Redis - will use in-memory store
+    }
+  }
+  return rateLimitRedisClient;
+}
+
+/**
+ * Create rate limiter with Redis store (or in-memory fallback)
  */
 const createRateLimiter = (options = {}) => {
   const defaultOptions = {
@@ -28,14 +51,22 @@ const createRateLimiter = (options = {}) => {
     },
   };
 
-  return rateLimit({
+  const limiterOptions = {
     ...defaultOptions,
     ...options,
-    store: new RedisStore({
-      client: redisClient,
+  };
+
+  // Add Redis store if client is available
+  if (rateLimitRedisClient) {
+    limiterOptions.store = new RedisStore({
+      client: rateLimitRedisClient,
       prefix: 'rl:',
-    }),
-  });
+    });
+  } else {
+    console.warn('⚠️  Rate limiter using in-memory store (Redis client not initialized)');
+  }
+
+  return rateLimit(limiterOptions);
 };
 
 /**
@@ -115,6 +146,7 @@ const customApiKeyLimit = async (req, res, next) => {
 };
 
 module.exports = {
+  initRateLimitClient,
   global,
   auth,
   messages,

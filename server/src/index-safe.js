@@ -196,7 +196,13 @@ async function startServer() {
     console.log('Redis URL:', config.redis.url ? 'Set (hidden)' : 'NOT SET');
     await redis.testConnection();
     console.log('✅ Redis connection successful');
-    
+
+    // Initialize rate limit Redis client
+    console.log('🔍 Initializing rate limit Redis client...');
+    const rateLimiter = require('./middleware/rateLimiter');
+    await rateLimiter.initRateLimitClient();
+    console.log('✅ Rate limit Redis client initialized');
+
     // Initialize WhatsApp manager
     console.log('📱 Initializing WhatsApp manager...');
     await whatsappService.initializeWhatsAppManager();
