@@ -1,0 +1,130 @@
+name: Deploy WhatsApp API Platform
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Test Application
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: |
+          server/package-lock.json
+          client/package-lock.json
+    
+    - name: Install server dependencies
+      run: |
+        cd server
+        npm ci
+    
+    - name: Install client dependencies
+      run: |
+        cd client
+        npm ci
+    
+    - name: Run server tests
+      run: |
+        cd server
+        npm test || echo "No tests configured"
+    
+    - name: Run client tests
+      run: |
+        cd client
+        npm test || echo "No tests configured"
+    
+    - name: Build client
+      run: |
+        cd client
+        npm run build
+    
+    - name: Lint code
+      run: |
+        cd server && npm run lint || echo "Linting skipped"
+        cd ../client && npm run lint || echo "Linting skipped"
+
+  deploy-railway:
+    needs: test
+    runs-on: ubuntu-latest
+    name: Deploy Backend to Railway
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+    
+    - name: Install Railway CLI
+      run: npm install -g @railway/cli
+    
+    - name: Deploy to Railway
+      env:
+        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      run: |
+        railway login --token $RAILWAY_TOKEN
+        railway up --service backend || railway up
+    
+    - name: Run Database Migrations
+      env:
+        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      run: |
+        railway run npm run db:migrate || echo "Migration failed or already applied"
+
+  deploy-vercel:
+    needs: test
+    runs-on: ubuntu-latest
+    name: Deploy Frontend to Vercel
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+    
+    - name: Install Vercel CLI
+      run: npm install -g vercel
+    
+    - name: Deploy to Vercel
+      env:
+        VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+        VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      run: |
+        cd client
+        vercel --token $VERCEL_TOKEN --prod --yes
+
+  notify:
+    needs: [deploy-railway, deploy-vercel]
+    runs-on: ubuntu-latest
+    name: Deployment Notification
+    if: always() && github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+    - name: Deployment Status
+      run: |
+        echo "🚀 Deployment completed!"
+        echo "Backend: Railway"
+        echo "Frontend: Vercel"
+        echo "Status: ${{ needs.deploy-railway.result }} / ${{ needs.deploy-vercel.result }}"

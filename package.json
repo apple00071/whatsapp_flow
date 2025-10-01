@@ -1,0 +1,47 @@
+{
+  "name": "whatsapp-api-platform",
+  "version": "1.0.0",
+  "description": "WhatsApp Programmable Messaging Platform - Production Ready",
+  "main": "server/src/index.js",
+  "scripts": {
+    "start": "cd server && npm start",
+    "dev": "cd server && npm run dev",
+    "build": "cd server && npm install",
+    "install-server": "cd server && npm install",
+    "install-client": "cd client && npm install",
+    "install-all": "npm run install-server && npm run install-client",
+    "db:migrate": "cd server && npm run db:migrate",
+    "db:seed": "cd server && npm run db:seed",
+    "db:reset": "cd server && npm run db:reset",
+    "test": "cd server && npm test",
+    "lint": "cd server && npm run lint && cd ../client && npm run lint",
+    "railway:build": "cd server && npm install",
+    "railway:start": "cd server && npm start",
+    "postinstall": "cd server && npm install"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "keywords": [
+    "whatsapp",
+    "api",
+    "messaging",
+    "platform",
+    "nodejs",
+    "react",
+    "supabase",
+    "railway",
+    "vercel"
+  ],
+  "author": "WhatsApp API Platform",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/apple00071/whatsapp_flow.git"
+  },
+  "homepage": "https://github.com/apple00071/whatsapp_flow#readme",
+  "bugs": {
+    "url": "https://github.com/apple00071/whatsapp_flow/issues"
+  }
+}
