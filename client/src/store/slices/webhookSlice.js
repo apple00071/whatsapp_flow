@@ -21,7 +21,7 @@ export const fetchWebhooks = createAsyncThunk(
   'webhooks/fetchAll',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get('/webhooks');
+      const response = await api.get('/api/v1/webhooks');
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to fetch webhooks');
@@ -33,7 +33,7 @@ export const getWebhook = createAsyncThunk(
   'webhooks/getOne',
   async (webhookId, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/webhooks/${webhookId}`);
+      const response = await api.get(`/api/v1/webhooks/${webhookId}`);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to fetch webhook');
@@ -45,7 +45,7 @@ export const createWebhook = createAsyncThunk(
   'webhooks/create',
   async (webhookData, { rejectWithValue }) => {
     try {
-      const response = await api.post('/webhooks', webhookData);
+      const response = await api.post('/api/v1/webhooks', webhookData);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to create webhook');
@@ -57,7 +57,7 @@ export const updateWebhook = createAsyncThunk(
   'webhooks/update',
   async ({ webhookId, data }, { rejectWithValue }) => {
     try {
-      const response = await api.put(`/webhooks/${webhookId}`, data);
+      const response = await api.put(`/api/v1/webhooks/${webhookId}`, data);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to update webhook');
@@ -69,7 +69,7 @@ export const deleteWebhook = createAsyncThunk(
   'webhooks/delete',
   async (webhookId, { rejectWithValue }) => {
     try {
-      await api.delete(`/webhooks/${webhookId}`);
+      await api.delete(`/api/v1/webhooks/${webhookId}`);
       return webhookId;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to delete webhook');
@@ -81,7 +81,7 @@ export const regenerateSecret = createAsyncThunk(
   'webhooks/regenerateSecret',
   async (webhookId, { rejectWithValue }) => {
     try {
-      const response = await api.post(`/webhooks/${webhookId}/regenerate-secret`);
+      const response = await api.post(`/api/v1/webhooks/${webhookId}/regenerate-secret`);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to regenerate secret');
@@ -93,7 +93,7 @@ export const testWebhook = createAsyncThunk(
   'webhooks/test',
   async (webhookId, { rejectWithValue }) => {
     try {
-      const response = await api.post(`/webhooks/${webhookId}/test`);
+      const response = await api.post(`/api/v1/webhooks/${webhookId}/test`);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to test webhook');
@@ -105,7 +105,7 @@ export const fetchWebhookLogs = createAsyncThunk(
   'webhooks/fetchLogs',
   async ({ webhookId, page = 1, limit = 50 }, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/webhooks/${webhookId}/logs`, {
+      const response = await api.get(`/api/v1/webhooks/${webhookId}/logs`, {
         params: { page, limit },
       });
       return response.data.data;
@@ -119,7 +119,7 @@ export const resetFailures = createAsyncThunk(
   'webhooks/resetFailures',
   async (webhookId, { rejectWithValue }) => {
     try {
-      const response = await api.post(`/webhooks/${webhookId}/reset-failures`);
+      const response = await api.post(`/api/v1/webhooks/${webhookId}/reset-failures`);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to reset failures');

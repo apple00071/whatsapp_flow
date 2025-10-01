@@ -29,7 +29,7 @@ export const fetchGroups = createAsyncThunk(
       const params = { page, limit };
       if (sessionId) params.sessionId = sessionId;
       
-      const response = await api.get('/groups', { params });
+      const response = await api.get('/api/v1/groups', { params });
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to fetch groups');
@@ -41,7 +41,7 @@ export const getGroup = createAsyncThunk(
   'groups/getOne',
   async (groupId, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/groups/${groupId}`);
+      const response = await api.get(`/api/v1/groups/${groupId}`);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to fetch group');
@@ -53,7 +53,7 @@ export const createGroup = createAsyncThunk(
   'groups/create',
   async (groupData, { rejectWithValue }) => {
     try {
-      const response = await api.post('/groups', groupData);
+      const response = await api.post('/api/v1/groups', groupData);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to create group');
@@ -65,7 +65,7 @@ export const updateGroup = createAsyncThunk(
   'groups/update',
   async ({ groupId, data }, { rejectWithValue }) => {
     try {
-      const response = await api.put(`/groups/${groupId}`, data);
+      const response = await api.put(`/api/v1/groups/${groupId}`, data);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to update group');
@@ -77,7 +77,7 @@ export const syncGroups = createAsyncThunk(
   'groups/sync',
   async (sessionId, { rejectWithValue }) => {
     try {
-      const response = await api.post('/groups/sync', { sessionId });
+      const response = await api.post('/api/v1/groups/sync', { sessionId });
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to sync groups');
@@ -89,7 +89,7 @@ export const addParticipants = createAsyncThunk(
   'groups/addParticipants',
   async ({ groupId, participants }, { rejectWithValue }) => {
     try {
-      const response = await api.post(`/groups/${groupId}/participants`, { participants });
+      const response = await api.post(`/api/v1/groups/${groupId}/participants`, { participants });
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to add participants');
@@ -101,7 +101,7 @@ export const removeParticipants = createAsyncThunk(
   'groups/removeParticipants',
   async ({ groupId, participants }, { rejectWithValue }) => {
     try {
-      const response = await api.delete(`/groups/${groupId}/participants`, {
+      const response = await api.delete(`/api/v1/groups/${groupId}/participants`, {
         data: { participants },
       });
       return response.data.data;
@@ -115,7 +115,7 @@ export const leaveGroup = createAsyncThunk(
   'groups/leave',
   async (groupId, { rejectWithValue }) => {
     try {
-      const response = await api.post(`/groups/${groupId}/leave`);
+      const response = await api.post(`/api/v1/groups/${groupId}/leave`);
       return { groupId, ...response.data.data };
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to leave group');

@@ -29,7 +29,7 @@ export const fetchMessages = createAsyncThunk(
       if (sessionId) params.sessionId = sessionId;
       if (phone) params.phone = phone;
       
-      const response = await api.get('/messages', { params });
+      const response = await api.get('/api/v1/messages', { params });
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to fetch messages');
@@ -41,7 +41,7 @@ export const sendTextMessage = createAsyncThunk(
   'messages/sendText',
   async (messageData, { rejectWithValue }) => {
     try {
-      const response = await api.post('/messages/send', messageData);
+      const response = await api.post('/api/v1/messages/send', messageData);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to send message');
@@ -60,7 +60,7 @@ export const sendMediaMessage = createAsyncThunk(
       if (caption) formData.append('caption', caption);
       if (type) formData.append('type', type);
 
-      const response = await api.post('/messages/media', formData, {
+      const response = await api.post('/api/v1/messages/media', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -76,7 +76,7 @@ export const sendLocationMessage = createAsyncThunk(
   'messages/sendLocation',
   async (locationData, { rejectWithValue }) => {
     try {
-      const response = await api.post('/messages/location', locationData);
+      const response = await api.post('/api/v1/messages/location', locationData);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to send location');
@@ -88,7 +88,7 @@ export const getMessage = createAsyncThunk(
   'messages/getOne',
   async (messageId, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/messages/${messageId}`);
+      const response = await api.get(`/api/v1/messages/${messageId}`);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to fetch message');
@@ -100,7 +100,7 @@ export const getMessageStatus = createAsyncThunk(
   'messages/getStatus',
   async (messageId, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/messages/${messageId}/status`);
+      const response = await api.get(`/api/v1/messages/${messageId}/status`);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to fetch message status');

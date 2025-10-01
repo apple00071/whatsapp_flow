@@ -29,7 +29,7 @@ export const fetchSessions = createAsyncThunk(
       const params = { page, limit };
       if (status) params.status = status;
       
-      const response = await api.get('/sessions', { params });
+      const response = await api.get('/api/v1/sessions', { params });
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to fetch sessions');
@@ -41,7 +41,7 @@ export const createSession = createAsyncThunk(
   'sessions/create',
   async (sessionData, { rejectWithValue }) => {
     try {
-      const response = await api.post('/sessions', sessionData);
+      const response = await api.post('/api/v1/sessions', sessionData);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to create session');
@@ -53,7 +53,7 @@ export const getSession = createAsyncThunk(
   'sessions/getOne',
   async (sessionId, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/sessions/${sessionId}`);
+      const response = await api.get(`/api/v1/sessions/${sessionId}`);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to fetch session');
@@ -65,7 +65,7 @@ export const updateSession = createAsyncThunk(
   'sessions/update',
   async ({ sessionId, data }, { rejectWithValue }) => {
     try {
-      const response = await api.put(`/sessions/${sessionId}`, data);
+      const response = await api.put(`/api/v1/sessions/${sessionId}`, data);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to update session');
@@ -77,7 +77,7 @@ export const deleteSession = createAsyncThunk(
   'sessions/delete',
   async (sessionId, { rejectWithValue }) => {
     try {
-      await api.delete(`/sessions/${sessionId}`);
+      await api.delete(`/api/v1/sessions/${sessionId}`);
       return sessionId;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to delete session');
@@ -89,7 +89,7 @@ export const getQRCode = createAsyncThunk(
   'sessions/getQR',
   async (sessionId, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/sessions/${sessionId}/qr`);
+      const response = await api.get(`/api/v1/sessions/${sessionId}/qr`);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to get QR code');
@@ -101,7 +101,7 @@ export const reconnectSession = createAsyncThunk(
   'sessions/reconnect',
   async (sessionId, { rejectWithValue }) => {
     try {
-      const response = await api.post(`/sessions/${sessionId}/reconnect`);
+      const response = await api.post(`/api/v1/sessions/${sessionId}/reconnect`);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to reconnect session');

@@ -21,7 +21,7 @@ export const fetchApiKeys = createAsyncThunk(
   'apiKeys/fetchAll',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get('/api-keys');
+      const response = await api.get('/api/v1/api-keys');
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to fetch API keys');
@@ -33,7 +33,7 @@ export const getApiKey = createAsyncThunk(
   'apiKeys/getOne',
   async (apiKeyId, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/api-keys/${apiKeyId}`);
+      const response = await api.get(`/api/v1/api-keys/${apiKeyId}`);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to fetch API key');
@@ -45,7 +45,7 @@ export const createApiKey = createAsyncThunk(
   'apiKeys/create',
   async (apiKeyData, { rejectWithValue }) => {
     try {
-      const response = await api.post('/api-keys', apiKeyData);
+      const response = await api.post('/api/v1/api-keys', apiKeyData);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to create API key');
@@ -57,7 +57,7 @@ export const updateApiKey = createAsyncThunk(
   'apiKeys/update',
   async ({ apiKeyId, data }, { rejectWithValue }) => {
     try {
-      const response = await api.put(`/api-keys/${apiKeyId}`, data);
+      const response = await api.put(`/api/v1/api-keys/${apiKeyId}`, data);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to update API key');
@@ -69,7 +69,7 @@ export const deleteApiKey = createAsyncThunk(
   'apiKeys/delete',
   async (apiKeyId, { rejectWithValue }) => {
     try {
-      await api.delete(`/api-keys/${apiKeyId}`);
+      await api.delete(`/api/v1/api-keys/${apiKeyId}`);
       return apiKeyId;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to delete API key');
@@ -81,7 +81,7 @@ export const revokeApiKey = createAsyncThunk(
   'apiKeys/revoke',
   async (apiKeyId, { rejectWithValue }) => {
     try {
-      const response = await api.post(`/api-keys/${apiKeyId}/revoke`);
+      const response = await api.post(`/api/v1/api-keys/${apiKeyId}/revoke`);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to revoke API key');
@@ -93,7 +93,7 @@ export const regenerateApiKey = createAsyncThunk(
   'apiKeys/regenerate',
   async (apiKeyId, { rejectWithValue }) => {
     try {
-      const response = await api.post(`/api-keys/${apiKeyId}/regenerate`);
+      const response = await api.post(`/api/v1/api-keys/${apiKeyId}/regenerate`);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to regenerate API key');
@@ -105,7 +105,7 @@ export const getApiKeyStats = createAsyncThunk(
   'apiKeys/getStats',
   async (apiKeyId, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/api-keys/${apiKeyId}/stats`);
+      const response = await api.get(`/api/v1/api-keys/${apiKeyId}/stats`);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to fetch API key stats');

@@ -21,7 +21,7 @@ export const register = createAsyncThunk(
   'auth/register',
   async (userData, { rejectWithValue }) => {
     try {
-      const response = await api.post('/auth/register', userData);
+      const response = await api.post('/api/v1/auth/register', userData);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Registration failed');
@@ -33,7 +33,7 @@ export const login = createAsyncThunk(
   'auth/login',
   async (credentials, { rejectWithValue }) => {
     try {
-      const response = await api.post('/auth/login', credentials);
+      const response = await api.post('/api/v1/auth/login', credentials);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Login failed');
@@ -45,7 +45,7 @@ export const logout = createAsyncThunk(
   'auth/logout',
   async (_, { rejectWithValue }) => {
     try {
-      await api.post('/auth/logout');
+      await api.post('/api/v1/auth/logout');
       return null;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Logout failed');
@@ -62,7 +62,7 @@ export const checkAuth = createAsyncThunk(
         return rejectWithValue('No token found');
       }
 
-      const response = await api.get('/users/me');
+      const response = await api.get('/api/v1/users/me');
       return response.data.data.user;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Authentication check failed');
@@ -75,7 +75,7 @@ export const refreshAccessToken = createAsyncThunk(
   async (_, { getState, rejectWithValue }) => {
     try {
       const { refreshToken } = getState().auth;
-      const response = await api.post('/auth/refresh', { refreshToken });
+      const response = await api.post('/api/v1/auth/refresh', { refreshToken });
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Token refresh failed');
@@ -87,7 +87,7 @@ export const changePassword = createAsyncThunk(
   'auth/changePassword',
   async (passwords, { rejectWithValue }) => {
     try {
-      const response = await api.put('/auth/change-password', passwords);
+      const response = await api.put('/api/v1/auth/change-password', passwords);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Password change failed');

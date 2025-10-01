@@ -29,7 +29,7 @@ export const fetchContacts = createAsyncThunk(
       if (search) params.search = search;
       if (sessionId) params.sessionId = sessionId;
       
-      const response = await api.get('/contacts', { params });
+      const response = await api.get('/api/v1/contacts', { params });
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to fetch contacts');
@@ -41,7 +41,7 @@ export const createContact = createAsyncThunk(
   'contacts/create',
   async (contactData, { rejectWithValue }) => {
     try {
-      const response = await api.post('/contacts', contactData);
+      const response = await api.post('/api/v1/contacts', contactData);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to create contact');
@@ -53,7 +53,7 @@ export const updateContact = createAsyncThunk(
   'contacts/update',
   async ({ contactId, data }, { rejectWithValue }) => {
     try {
-      const response = await api.put(`/contacts/${contactId}`, data);
+      const response = await api.put(`/api/v1/contacts/${contactId}`, data);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to update contact');
@@ -65,7 +65,7 @@ export const deleteContact = createAsyncThunk(
   'contacts/delete',
   async (contactId, { rejectWithValue }) => {
     try {
-      await api.delete(`/contacts/${contactId}`);
+      await api.delete(`/api/v1/contacts/${contactId}`);
       return contactId;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to delete contact');
@@ -77,7 +77,7 @@ export const syncContacts = createAsyncThunk(
   'contacts/sync',
   async (sessionId, { rejectWithValue }) => {
     try {
-      const response = await api.post('/contacts/sync', { sessionId });
+      const response = await api.post('/api/v1/contacts/sync', { sessionId });
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to sync contacts');
@@ -93,7 +93,7 @@ export const importContacts = createAsyncThunk(
       formData.append('sessionId', sessionId);
       formData.append('file', file);
 
-      const response = await api.post('/contacts/import', formData, {
+      const response = await api.post('/api/v1/contacts/import', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -109,7 +109,7 @@ export const exportContacts = createAsyncThunk(
   'contacts/export',
   async (sessionId, { rejectWithValue }) => {
     try {
-      const response = await api.get('/contacts/export', {
+      const response = await api.get('/api/v1/contacts/export', {
         params: { sessionId },
         responseType: 'blob',
       });
