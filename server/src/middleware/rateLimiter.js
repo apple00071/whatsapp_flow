@@ -4,7 +4,7 @@
  */
 
 const rateLimit = require('express-rate-limit');
-const RedisStore = require('rate-limit-redis');
+const { RedisStore } = require('rate-limit-redis');
 const { redisClient } = require('../config/redis');
 const config = require('../config');
 const { ApiError } = require('./errorHandler');
