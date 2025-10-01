@@ -4,35 +4,114 @@
  */
 
 const { Sequelize } = require('sequelize');
+const dns = require('dns');
 const config = require('./index');
 const logger = require('../utils/logger');
 
+// Force IPv4 DNS resolution to avoid ENETUNREACH errors
+// Render.com may not support IPv6 connectivity to Supabase
+dns.setDefaultResultOrder('ipv4first');
+
+/**
+ * Parse DATABASE_URL and create Sequelize configuration
+ * This ensures proper handling of special characters in password
+ */
+let sequelizeConfig;
+
+if (config.database.url) {
+  try {
+    const dbUrl = new URL(config.database.url);
+
+    // Extract connection details from URL
+    const host = dbUrl.hostname;
+    const port = dbUrl.port || 5432;
+    const database = dbUrl.pathname.slice(1); // Remove leading '/'
+    const username = dbUrl.username;
+    const password = decodeURIComponent(dbUrl.password); // Decode URL-encoded password
+
+    logger.info(`Connecting to database: ${host}:${port}/${database}`);
+
+    sequelizeConfig = {
+      host,
+      port,
+      database,
+      username,
+      password,
+      dialect: 'postgres',
+      dialectOptions: {
+        ssl: {
+          require: true,
+          rejectUnauthorized: false, // Required for Supabase
+        },
+        // Connection timeout settings
+        connectTimeout: 60000, // 60 seconds
+        keepAlive: true,
+        keepAliveInitialDelayMillis: 10000,
+      },
+      logging: config.database.logging ? (msg) => logger.debug(msg) : false,
+      pool: {
+        min: config.database.pool.min,
+        max: config.database.pool.max,
+        acquire: 60000, // Increased timeout for slow connections
+        idle: 10000,
+      },
+      // Retry configuration for network errors
+      retry: {
+        max: 3,
+        match: [
+          /ENETUNREACH/,
+          /ETIMEDOUT/,
+          /ECONNRESET/,
+          /ECONNREFUSED/,
+          /SequelizeConnectionError/,
+        ],
+      },
+      define: {
+        timestamps: true,
+        underscored: true,
+        createdAt: 'created_at',
+        updatedAt: 'updated_at',
+      },
+    };
+  } catch (error) {
+    logger.error('Failed to parse DATABASE_URL:', error);
+    throw new Error('Invalid DATABASE_URL format');
+  }
+} else {
+  // Fallback to individual environment variables
+  sequelizeConfig = {
+    host: config.database.host,
+    port: config.database.port,
+    database: config.database.name,
+    username: config.database.user,
+    password: config.database.password,
+    dialect: 'postgres',
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false,
+      },
+    },
+    logging: config.database.logging ? (msg) => logger.debug(msg) : false,
+    pool: {
+      min: config.database.pool.min,
+      max: config.database.pool.max,
+      acquire: 60000,
+      idle: 10000,
+    },
+    define: {
+      timestamps: true,
+      underscored: true,
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
+    },
+  };
+}
+
 /**
  * Initialize Sequelize instance with Supabase configuration
- * Supabase uses PostgreSQL, so we use the 'postgres' dialect
  */
-const sequelize = new Sequelize(config.database.url, {
-  dialect: 'postgres',
-  dialectOptions: {
-    ssl: {
-      require: true,
-      rejectUnauthorized: false, // Required for Supabase
-    },
-  },
-  logging: config.database.logging ? (msg) => logger.debug(msg) : false,
-  pool: {
-    min: config.database.pool.min,
-    max: config.database.pool.max,
-    acquire: 30000,
-    idle: 10000,
-  },
-  define: {
-    timestamps: true,
-    underscored: true,
-    createdAt: 'created_at',
-    updatedAt: 'updated_at',
-  },
-});
+const sequelize = new Sequelize(sequelizeConfig);
 
 /**
  * Test database connection
