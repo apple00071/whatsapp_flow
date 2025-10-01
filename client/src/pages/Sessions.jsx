@@ -52,9 +52,13 @@ const Sessions = () => {
     if (!newSessionName.trim()) return;
     
     try {
-      await dispatch(createSession({ name: newSessionName })).unwrap();
+      const result = await dispatch(createSession({ name: newSessionName })).unwrap();
       setCreateDialogOpen(false);
       setNewSessionName('');
+      
+      // Automatically show QR code for the newly created session
+      setSelectedSession(result);
+      setQrDialogOpen(true);
     } catch (err) {
       console.error('Failed to create session:', err);
     }
