@@ -5,6 +5,8 @@
 
 const { Sequelize } = require('sequelize');
 const dns = require('dns');
+const net = require('net');
+const pg = require('pg');
 const config = require('./index');
 const logger = require('../utils/logger');
 
@@ -13,10 +15,37 @@ const logger = require('../utils/logger');
 dns.setDefaultResultOrder('ipv4first');
 
 /**
+ * Custom connection function that forces IPv4
+ * This overrides pg's default connection behavior
+ */
+const originalConnect = net.Socket.prototype.connect;
+let ipv4Forced = false;
+
+function forceIPv4Connection() {
+  if (ipv4Forced) return;
+
+  net.Socket.prototype.connect = function(...args) {
+    const options = args[0];
+    if (typeof options === 'object' && options !== null) {
+      // Force IPv4 family
+      options.family = 4;
+      logger.info('Forcing IPv4 connection for database');
+    }
+    return originalConnect.apply(this, args);
+  };
+
+  ipv4Forced = true;
+  logger.info('IPv4 connection enforced at socket level');
+}
+
+/**
  * Parse DATABASE_URL and create Sequelize configuration
  * This ensures proper handling of special characters in password
  */
 let sequelizeConfig;
+
+// Force IPv4 at socket level BEFORE creating any connections
+forceIPv4Connection();
 
 if (config.database.url) {
   try {
