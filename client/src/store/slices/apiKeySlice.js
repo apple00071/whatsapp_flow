@@ -22,7 +22,7 @@ export const fetchApiKeys = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get('/api/v1/api-keys');
-      return response.data.data;
+      return response.data.data.apiKeys || [];
     } catch (error) {
       // Handle structured error response from backend
       if (error.response?.data?.error) {

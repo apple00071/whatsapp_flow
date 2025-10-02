@@ -87,14 +87,7 @@ const ApiKeys = () => {
     navigator.clipboard.writeText(key);
   };
 
-  const toggleShowKey = (keyId) => {
-    setShowKey(prev => ({ ...prev, [keyId]: !prev[keyId] }));
-  };
 
-  const maskKey = (key) => {
-    if (!key) return '';
-    return key.substring(0, 8) + '...' + key.substring(key.length - 8);
-  };
 
   if (loading && apiKeys.length === 0) {
     return <Loading message="Loading API keys..." />;
@@ -146,21 +139,16 @@ const ApiKeys = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {Array.isArray(apiKeys) && apiKeys.map((apiKey) => (
+            {Array.isArray(apiKeys) && apiKeys.length > 0 ? apiKeys.map((apiKey) => (
               <TableRow key={apiKey.id}>
-                <TableCell>{apiKey.name}</TableCell>
+                <TableCell>{apiKey?.name || 'N/A'}</TableCell>
                 <TableCell>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                      {showKey[apiKey.id] ? apiKey.key : maskKey(apiKey.key)}
+                      {apiKey.key_prefix}***
                     </Typography>
-                    <Tooltip title={showKey[apiKey.id] ? 'Hide' : 'Show'}>
-                      <IconButton size="small" onClick={() => toggleShowKey(apiKey.id)}>
-                        {showKey[apiKey.id] ? <VisibilityOffIcon fontSize="small" /> : <VisibilityIcon fontSize="small" />}
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Copy">
-                      <IconButton size="small" onClick={() => handleCopyKey(apiKey.key)}>
+                    <Tooltip title="Copy Prefix">
+                      <IconButton size="small" onClick={() => handleCopyKey(apiKey.key_prefix)}>
                         <CopyIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
@@ -168,17 +156,17 @@ const ApiKeys = () => {
                 </TableCell>
                 <TableCell>
                   <Chip
-                    label={apiKey.isActive ? 'Active' : 'Revoked'}
-                    color={apiKey.isActive ? 'success' : 'error'}
+                    label={apiKey.is_active ? 'Active' : 'Revoked'}
+                    color={apiKey.is_active ? 'success' : 'error'}
                     size="small"
                   />
                 </TableCell>
                 <TableCell>
-                  {new Date(apiKey.createdAt).toLocaleDateString()}
+                  {new Date(apiKey.created_at).toLocaleDateString()}
                 </TableCell>
                 <TableCell>
-                  {apiKey.lastUsedAt
-                    ? new Date(apiKey.lastUsedAt).toLocaleDateString()
+                  {apiKey.last_used_at
+                    ? new Date(apiKey.last_used_at).toLocaleDateString()
                     : 'Never'}
                 </TableCell>
                 <TableCell align="right">
@@ -194,7 +182,15 @@ const ApiKeys = () => {
                   </IconButton>
                 </TableCell>
               </TableRow>
-            ))}
+            )) : (
+              <TableRow>
+                <TableCell colSpan={6} align="center">
+                  <Typography variant="body2" color="text.secondary">
+                    {loading ? 'Loading API keys...' : 'No API keys found. Create your first API key to get started.'}
+                  </Typography>
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </TableContainer>
