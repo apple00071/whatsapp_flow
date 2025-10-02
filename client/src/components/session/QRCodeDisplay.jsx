@@ -20,6 +20,7 @@ const QRCodeDisplay = ({ open, onClose, sessionId, sessionName }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [countdown, setCountdown] = useState(60);
+  const [qrError, setQrError] = useState('');
 
   useEffect(() => {
     if (open && sessionId) {
@@ -46,6 +47,7 @@ const QRCodeDisplay = ({ open, onClose, sessionId, sessionName }) => {
   const fetchQRCode = async () => {
     setLoading(true);
     setError('');
+    setQrError('');
     
     try {
       const result = await dispatch(getQRCode(sessionId)).unwrap();
@@ -60,6 +62,23 @@ const QRCodeDisplay = ({ open, onClose, sessionId, sessionName }) => {
   const handleRefresh = () => {
     setCountdown(60);
     fetchQRCode();
+  };
+
+  const renderQRCode = () => {
+    if (!qrCode) return null;
+
+    try {
+      return (
+        <QRCodeSVG
+          value={qrCode}
+          size={280}
+          level="H"
+          includeMargin={true}
+          errorCorrectionLevel="H"
+        />
+      );
+    } catch (err) {
+    }
   };
 
   return (
@@ -92,15 +111,15 @@ const QRCodeDisplay = ({ open, onClose, sessionId, sessionName }) => {
                   mb: 2,
                 }}
               >
-                <QRCodeSVG
-                  value={qrCode}
-                  size={280}
-                  level="H"
-                  includeMargin={true}
-                />
+                {renderQRCode()}
               </Box>
+              {qrError && (
+                <Alert severity="warning" sx={{ mb: 2 }}>
+                  {qrError}
+                </Alert>
+              )}
               <Typography variant="body2" color="text.secondary" gutterBottom>
-                Open WhatsApp on your phone and scan this QR code
+                Open WhatsApp on your phone and scan this QR code. Make sure the QR code is fully visible on your screen.
               </Typography>
               <Typography variant="caption" color="text.secondary">
                 QR code refreshes in {countdown} seconds
