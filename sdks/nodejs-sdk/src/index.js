@@ -3,13 +3,13 @@
  * Official SDK for interacting with the WhatsApp Programmable Messaging Platform
  * 
  * @example
- * const WhatsAppAPI = require('@whatsapp-platform/sdk');
- * 
+ * const WhatsAppAPI = require('whatsapp-flow-api-sdk');
+ *
  * const client = new WhatsAppAPI({
  *   apiKey: 'your-api-key',
- *   baseUrl: 'https://api.yourplatform.com'
+ *   baseUrl: 'https://whatsapp-flow-i0e2.onrender.com'
  * });
- * 
+ *
  * // Send a text message
  * await client.messages.sendText({
  *   sessionId: 'session-id',
@@ -30,7 +30,7 @@ class WhatsAppAPI {
    * Create a new WhatsApp API client
    * @param {Object} options - Configuration options
    * @param {string} options.apiKey - API key for authentication
-   * @param {string} [options.baseUrl='https://api.yourplatform.com'] - Base URL of the API
+   * @param {string} [options.baseUrl='https://whatsapp-flow-i0e2.onrender.com'] - Base URL of the API
    * @param {number} [options.timeout=30000] - Request timeout in milliseconds
    * @param {number} [options.maxRetries=3] - Maximum number of retry attempts
    */
@@ -40,7 +40,7 @@ class WhatsAppAPI {
     }
 
     this.apiKey = options.apiKey;
-    this.baseUrl = options.baseUrl || 'https://api.yourplatform.com';
+    this.baseUrl = options.baseUrl || 'https://whatsapp-flow-i0e2.onrender.com';
     this.timeout = options.timeout || 30000;
     this.maxRetries = options.maxRetries || 3;
 

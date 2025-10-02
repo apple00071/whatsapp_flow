@@ -56,9 +56,9 @@ const Chat = () => {
 
     try {
       await dispatch(sendTextMessage({
-        sessionId: selectedSession,
+        session_id: selectedSession,
         to: phoneNumber,
-        message: messageText,
+        content: messageText,
       })).unwrap();
       
       setMessageText('');

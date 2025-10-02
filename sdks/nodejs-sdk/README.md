@@ -1,322 +1,210 @@
-# WhatsApp Platform SDK for Node.js
+# WhatsApp Flow API SDK for Node.js
 
-Official Node.js SDK for the WhatsApp Programmable Messaging Platform.
+Official Node.js SDK for the WhatsApp Flow API Platform - Send messages, manage sessions, and integrate WhatsApp into your applications.
 
-## Installation
+## 🚀 Installation
 
 ```bash
-npm install @whatsapp-platform/sdk
+npm install whatsapp-flow-api-sdk
 ```
 
-## Quick Start
+## 📋 Quick Start
+
+### 1. Initialize the Client
 
 ```javascript
-const WhatsAppAPI = require('@whatsapp-platform/sdk');
+const WhatsAppAPI = require('whatsapp-flow-api-sdk');
 
-// Initialize the client
 const client = new WhatsAppAPI({
-  apiKey: 'your-api-key',
-  baseUrl: 'https://api.yourplatform.com' // Optional, defaults to production URL
+  apiKey: 'your-api-key-here',
+  baseUrl: 'https://whatsapp-flow-i0e2.onrender.com' // Optional, this is the default
 });
+```
 
-// Send a text message
-async function sendMessage() {
+### 2. Create a Session and Get QR Code
+
+```javascript
+async function connectWhatsApp() {
   try {
-    const result = await client.messages.sendText({
-      sessionId: 'your-session-id',
-      to: '1234567890',
-      message: 'Hello from WhatsApp API!'
+    // Create a new session
+    const session = await client.sessions.create({
+      name: 'My Website Session'
     });
     
-    console.log('Message sent:', result);
+    console.log('Session created:', session.data.id);
+    
+    // Get QR code for scanning
+    const qrData = await client.sessions.getQR(session.data.id);
+    console.log('Scan this QR code with WhatsApp:', qrData.data.qrCode);
+    
+    // Wait for connection (you can poll the session status)
+    await waitForConnection(session.data.id);
+    
+    return session.data.id;
   } catch (error) {
     console.error('Error:', error.message);
   }
 }
 
-sendMessage();
+async function waitForConnection(sessionId) {
+  return new Promise((resolve, reject) => {
+    const checkStatus = async () => {
+      try {
+        const session = await client.sessions.get(sessionId);
+        if (session.data.status === 'connected') {
+          console.log('WhatsApp connected!');
+          resolve(session);
+        } else if (session.data.status === 'failed') {
+          reject(new Error('Connection failed'));
+        } else {
+          setTimeout(checkStatus, 2000); // Check every 2 seconds
+        }
+      } catch (error) {
+        reject(error);
+      }
+    };
+    checkStatus();
+  });
+}
 ```
 
-## Configuration
-
-### Options
-
-- `apiKey` (required): Your API key from the platform
-- `baseUrl` (optional): Base URL of the API (default: production URL)
-- `timeout` (optional): Request timeout in milliseconds (default: 30000)
-- `maxRetries` (optional): Maximum number of retry attempts (default: 3)
+### 3. Send Messages
 
 ```javascript
-const client = new WhatsAppAPI({
-  apiKey: 'your-api-key',
-  baseUrl: 'http://localhost:3000',
-  timeout: 60000,
-  maxRetries: 5
-});
+async function sendMessage(sessionId) {
+  try {
+    // Send text message
+    const textMessage = await client.messages.sendText({
+      sessionId: sessionId,
+      to: '1234567890', // Phone number without + or country code
+      message: 'Hello from WhatsApp Flow API!'
+    });
+    
+    console.log('Text message sent:', textMessage.data.id);
+    
+    // Send media message
+    const mediaMessage = await client.messages.sendMedia({
+      sessionId: sessionId,
+      to: '1234567890',
+      type: 'image',
+      mediaUrl: 'https://example.com/image.jpg',
+      caption: 'Check out this image!'
+    });
+    
+    console.log('Media message sent:', mediaMessage.data.id);
+    
+  } catch (error) {
+    console.error('Error sending message:', error.message);
+  }
+}
 ```
 
-## Sessions
+## 📚 API Reference
 
-### Create a Session
-
-```javascript
-const session = await client.sessions.create({
-  name: 'My WhatsApp Session'
-});
-
-console.log('Session ID:', session.data.id);
-```
-
-### Get QR Code
+### Sessions
 
 ```javascript
-const qr = await client.sessions.getQR('session-id');
-console.log('QR Code:', qr.data.qrCode);
-```
+// Create session
+const session = await client.sessions.create({ name: 'Session Name' });
 
-### List Sessions
-
-```javascript
+// List sessions
 const sessions = await client.sessions.list();
-console.log('Sessions:', sessions.data);
+
+// Get session details
+const session = await client.sessions.get(sessionId);
+
+// Get QR code
+const qrData = await client.sessions.getQR(sessionId);
+
+// Delete session
+await client.sessions.delete(sessionId);
 ```
 
-### Get Session Details
+### Messages
 
 ```javascript
-const session = await client.sessions.get('session-id');
-console.log('Session:', session.data);
-```
-
-### Delete Session
-
-```javascript
-await client.sessions.delete('session-id');
-console.log('Session deleted');
-```
-
-## Messages
-
-### Send Text Message
-
-```javascript
-const message = await client.messages.sendText({
+// Send text message
+await client.messages.sendText({
   sessionId: 'session-id',
   to: '1234567890',
-  message: 'Hello, World!'
+  message: 'Hello World!'
 });
 
-console.log('Message ID:', message.data.id);
-```
-
-### Send Image
-
-```javascript
-const message = await client.messages.sendMedia({
+// Send media message
+await client.messages.sendMedia({
   sessionId: 'session-id',
   to: '1234567890',
-  type: 'image',
-  mediaUrl: 'https://example.com/image.jpg',
-  caption: 'Check out this image!'
+  type: 'image', // image, video, audio, document
+  mediaUrl: 'https://example.com/file.jpg',
+  caption: 'Optional caption'
 });
-```
 
-### Send Local File
-
-```javascript
-const message = await client.messages.sendMedia({
-  sessionId: 'session-id',
-  to: '1234567890',
-  type: 'document',
-  mediaUrl: './path/to/document.pdf',
-  caption: 'Here is the document'
-});
-```
-
-### Send Location
-
-```javascript
-const message = await client.messages.sendLocation({
-  sessionId: 'session-id',
-  to: '1234567890',
-  latitude: 37.7749,
-  longitude: -122.4194,
-  name: 'San Francisco',
-  address: 'San Francisco, CA, USA'
-});
-```
-
-### Get Message History
-
-```javascript
+// Get message history
 const messages = await client.messages.list({
   sessionId: 'session-id',
   page: 1,
   limit: 50
 });
-
-console.log('Messages:', messages.data);
 ```
 
-### Get Message Status
+## 🔑 Authentication
+
+Get your API key from the WhatsApp Flow dashboard:
+1. Go to: https://dist-eta-sooty.vercel.app
+2. Login to your account
+3. Navigate to API Keys section
+4. Create a new API key with required scopes
+
+## 📖 Complete Example
 
 ```javascript
-const status = await client.messages.getStatus('message-id');
-console.log('Status:', status.data.status);
-```
+const WhatsAppAPI = require('whatsapp-flow-api-sdk');
 
-## Contacts
-
-### List Contacts
-
-```javascript
-const contacts = await client.contacts.list({
-  sessionId: 'session-id'
-});
-
-console.log('Contacts:', contacts.data);
-```
-
-### Create Contact
-
-```javascript
-const contact = await client.contacts.create({
-  sessionId: 'session-id',
-  phone_number: '1234567890',
-  name: 'John Doe'
-});
-```
-
-### Update Contact
-
-```javascript
-const contact = await client.contacts.update('contact-id', {
-  name: 'Jane Doe',
-  notes: 'Important client'
-});
-```
-
-### Delete Contact
-
-```javascript
-await client.contacts.delete('contact-id');
-```
-
-## Groups
-
-### List Groups
-
-```javascript
-const groups = await client.groups.list({
-  sessionId: 'session-id'
-});
-
-console.log('Groups:', groups.data);
-```
-
-### Get Group Details
-
-```javascript
-const group = await client.groups.get('group-id');
-console.log('Group:', group.data);
-```
-
-## Webhooks
-
-### Create Webhook
-
-```javascript
-const webhook = await client.webhooks.create({
-  url: 'https://your-server.com/webhook',
-  events: ['message.received', 'message.status'],
-  sessionId: 'session-id' // Optional: for session-specific webhooks
-});
-
-console.log('Webhook ID:', webhook.data.id);
-```
-
-### List Webhooks
-
-```javascript
-const webhooks = await client.webhooks.list();
-console.log('Webhooks:', webhooks.data);
-```
-
-### Delete Webhook
-
-```javascript
-await client.webhooks.delete('webhook-id');
-```
-
-## Error Handling
-
-The SDK throws errors with the following structure:
-
-```javascript
-try {
-  await client.messages.sendText({
-    sessionId: 'invalid-session',
-    to: '1234567890',
-    message: 'Test'
+async function main() {
+  const client = new WhatsAppAPI({
+    apiKey: 'your-api-key-here'
   });
-} catch (error) {
-  console.error('Error:', error.message);
-  console.error('Status Code:', error.statusCode);
-  console.error('Details:', error.details);
+  
+  try {
+    // 1. Create session
+    console.log('Creating session...');
+    const session = await client.sessions.create({
+      name: 'Demo Session'
+    });
+    
+    // 2. Get QR code
+    console.log('Getting QR code...');
+    const qrData = await client.sessions.getQR(session.data.id);
+    console.log('QR Code:', qrData.data.qrCode);
+    console.log('Scan this QR code with WhatsApp');
+    
+    // 3. Wait for connection
+    console.log('Waiting for WhatsApp connection...');
+    await waitForConnection(session.data.id);
+    
+    // 4. Send message
+    console.log('Sending message...');
+    await client.messages.sendText({
+      sessionId: session.data.id,
+      to: '1234567890',
+      message: 'Hello from WhatsApp Flow API SDK!'
+    });
+    
+    console.log('Message sent successfully!');
+    
+  } catch (error) {
+    console.error('Error:', error.message);
+  }
 }
+
+main();
 ```
 
-## Retry Logic
+## 🌐 Links
 
-The SDK automatically retries failed requests with exponential backoff for:
-- Network errors
-- Server errors (5xx)
-- Rate limit errors (429)
+- **API Dashboard**: https://dist-eta-sooty.vercel.app
+- **API Documentation**: https://whatsapp-flow-i0e2.onrender.com/api/docs
 
-You can configure the maximum number of retries:
+## 📄 License
 
-```javascript
-const client = new WhatsAppAPI({
-  apiKey: 'your-api-key',
-  maxRetries: 5 // Default is 3
-});
-```
-
-## TypeScript Support
-
-The SDK includes TypeScript definitions:
-
-```typescript
-import WhatsAppAPI from '@whatsapp-platform/sdk';
-
-const client = new WhatsAppAPI({
-  apiKey: 'your-api-key'
-});
-
-// TypeScript will provide autocomplete and type checking
-const message = await client.messages.sendText({
-  sessionId: 'session-id',
-  to: '1234567890',
-  message: 'Hello!'
-});
-```
-
-## Examples
-
-See the [examples](./examples) directory for complete example applications:
-
-- [Basic Message Sending](./examples/basic-messaging.js)
-- [Webhook Integration](./examples/webhook-server.js)
-- [Bulk Messaging](./examples/bulk-messaging.js)
-- [Express.js Integration](./examples/express-integration.js)
-
-## Support
-
-- **Documentation**: https://docs.yourplatform.com
-- **Issues**: https://github.com/yourusername/whatsapp-api-platform/issues
-- **Email**: support@yourplatform.com
-
-## License
-
-MIT
-
+MIT License

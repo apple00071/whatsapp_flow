@@ -1,7 +1,7 @@
 {
-  "name": "@whatsapp-platform/sdk",
+  "name": "whatsapp-flow-api-sdk",
   "version": "1.0.0",
-  "description": "Official Node.js SDK for WhatsApp Programmable Messaging Platform",
+  "description": "Node.js SDK for WhatsApp Flow API Platform - Send messages, manage sessions, and integrate WhatsApp into your applications",
   "main": "src/index.js",
   "types": "types/index.d.ts",
   "scripts": {
@@ -15,9 +15,12 @@
     "api",
     "sdk",
     "messaging",
-    "automation"
+    "automation",
+    "whatsapp-flow",
+    "chat-api",
+    "business-messaging"
   ],
-  "author": "Your Name",
+  "author": "WhatsApp Flow Team",
   "license": "MIT",
   "repository": {
     "type": "git",

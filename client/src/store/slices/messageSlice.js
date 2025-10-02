@@ -44,7 +44,21 @@ export const sendTextMessage = createAsyncThunk(
       const response = await api.post('/api/v1/messages/send', messageData);
       return response.data.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.error || 'Failed to send message');
+      console.error('Send message error:', error.response?.data);
+
+      // Handle validation errors
+      if (error.response?.data?.details) {
+        const validationErrors = error.response.data.details
+          .map(detail => `${detail.field}: ${detail.message}`)
+          .join(', ');
+        return rejectWithValue(`Validation error: ${validationErrors}`);
+      }
+
+      return rejectWithValue(
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        'Failed to send message'
+      );
     }
   }
 );
