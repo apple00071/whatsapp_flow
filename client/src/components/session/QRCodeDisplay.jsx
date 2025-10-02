@@ -68,16 +68,31 @@ const QRCodeDisplay = ({ open, onClose, sessionId, sessionName }) => {
     if (!qrCode) return null;
 
     try {
+      // Validate QR code data
+      if (typeof qrCode !== 'string' || qrCode.length === 0) {
+        setQrError('Invalid QR code data received');
+        return null;
+      }
+
+      // Check if QR code is too long (max ~2953 characters for QR code)
+      if (qrCode.length > 2900) {
+        setQrError('QR code data is too long to display');
+        return null;
+      }
+
       return (
         <QRCodeSVG
           value={qrCode}
           size={280}
-          level="H"
+          level="M"
           includeMargin={true}
-          errorCorrectionLevel="H"
+          errorCorrectionLevel="M"
         />
       );
     } catch (err) {
+      console.error('QR Code rendering error:', err);
+      setQrError(`Failed to render QR code: ${err.message}`);
+      return null;
     }
   };
 

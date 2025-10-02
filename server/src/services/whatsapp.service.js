@@ -5,8 +5,6 @@
  */
 
 const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
-const QRCode = require('qrcode');
-const path = require('path');
 const fs = require('fs');
 const { Session, Message } = require('../models');
 const config = require('../config');
@@ -130,17 +128,16 @@ class WhatsAppManager {
     // QR code event
     client.on('qr', async (qr) => {
       logger.info(`QR code generated for session ${sessionId}`);
-      
+
       try {
-        // Generate QR code as data URL
-        const qrDataUrl = await QRCode.toDataURL(qr);
-        this.qrCodes.set(sessionId, qrDataUrl);
+        // Store raw QR string (not data URL)
+        this.qrCodes.set(sessionId, qr);
 
         // Update session in database
         await Session.update(
           {
             status: 'qr',
-            qr_code: qrDataUrl,
+            qr_code: qr,
             qr_expires_at: new Date(Date.now() + 60000), // 1 minute
           },
           { where: { id: sessionId } }
@@ -149,7 +146,7 @@ class WhatsAppManager {
         // Emit webhook event
         await webhookService.emitEvent(sessionId, 'session.qr', {
           sessionId,
-          qrCode: qrDataUrl,
+          qrCode: qr,
         });
       } catch (error) {
         logger.error(`Error handling QR code for session ${sessionId}:`, error);
