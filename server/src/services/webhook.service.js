@@ -146,6 +146,31 @@ async function emitEvent(sessionId, event, payload) {
       return;
     }
 
+    // Emit WebSocket event to frontend
+    const { emitToUser, emitToSession } = require('../websocket');
+
+    // Emit to user who owns the session
+    emitToUser(session.user_id, 'session:status', {
+      sessionId,
+      status: session.status,
+      phoneNumber: session.phone_number,
+      connectedAt: session.connected_at,
+      event,
+      ...payload,
+    });
+
+    // Also emit to session room
+    emitToSession(sessionId, 'session:status', {
+      sessionId,
+      status: session.status,
+      phoneNumber: session.phone_number,
+      connectedAt: session.connected_at,
+      event,
+      ...payload,
+    });
+
+    logger.info(`Emitted WebSocket event ${event} for session ${sessionId}`);
+
     // Find webhooks for this session and event
     const webhooks = await Webhook.findAll({
       where: {

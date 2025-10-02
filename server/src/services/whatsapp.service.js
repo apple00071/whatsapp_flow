@@ -153,6 +153,32 @@ class WhatsAppManager {
       }
     });
 
+    // Authenticated event (QR code scanned successfully)
+    client.on('authenticated', async () => {
+      logger.info(`WhatsApp client authenticated for session ${sessionId}`);
+
+      try {
+        // Update session status to authenticating
+        await Session.update(
+          {
+            status: 'authenticating',
+            qr_code: null,
+          },
+          { where: { id: sessionId } }
+        );
+
+        // Clear QR code from memory
+        this.qrCodes.delete(sessionId);
+
+        // Emit webhook event
+        await webhookService.emitEvent(sessionId, 'session.authenticated', {
+          sessionId,
+        });
+      } catch (error) {
+        logger.error(`Error handling authenticated event for session ${sessionId}:`, error);
+      }
+    });
+
     // Ready event (connected)
     client.on('ready', async () => {
       logger.info(`WhatsApp client ready for session ${sessionId}`);

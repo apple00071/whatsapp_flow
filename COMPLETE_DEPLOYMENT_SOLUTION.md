@@ -83,7 +83,7 @@ After service is created:
    PORT=10000
    DATABASE_URL=postgresql://postgres:hC6gdcJ$fr*$PUv@db.frifbegpqtxllisfmfmw.supabase.co:5432/postgres
    REDIS_URL=redis://default:o7yWxZ0qqGR5gWqVOX8OTGXD24XROBWg@redis-13390.crce217.ap-south-1-1.ec2.redns.redis-cloud.com:13390
-   CORS_ORIGIN=https://dist-eta-sootyvercel.app
+   CORS_ORIGIN=https://dist-eta-sooty.vercel.app
    JWT_SECRET=whatsapp-api-super-secret-jwt-key-production-2024-min-32-chars
    REFRESH_TOKEN_SECRET=whatsapp-api-refresh-token-secret-production-2024-min-32-chars
    ```
@@ -256,7 +256,7 @@ Now that backend is deployed, update frontend to use it.
    - Clear cached images and files
 
 2. **Visit Registration Page**
-   - Go to: https://dist-eta-sootyvercel.app/register
+   - Go to: https://dist-eta-sooty.vercel.app/register
 
 3. **Open DevTools**
    - Press F12
@@ -328,7 +328,7 @@ Now that backend is deployed, update frontend to use it.
 ### Issue: CORS error
 
 **Fix**:
-1. Verify `CORS_ORIGIN=https://dist-eta-sootyvercel.app` in Render
+1. Verify `CORS_ORIGIN=https://dist-eta-sooty.vercel.app` in Render
 2. No trailing slash!
 3. Redeploy backend
 

@@ -11,11 +11,15 @@ import {
   Alert,
 } from '@mui/material';
 import { QRCodeSVG } from 'qrcode.react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getQRCode } from '../../store/slices/sessionSlice';
+import websocketService from '../../services/websocket';
 
 const QRCodeDisplay = ({ open, onClose, sessionId, sessionName }) => {
   const dispatch = useDispatch();
+  const sessions = useSelector((state) => state.sessions.sessions);
+  const currentSession = sessions.find(s => s.id === sessionId);
+
   const [qrCode, setQrCode] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -25,7 +29,10 @@ const QRCodeDisplay = ({ open, onClose, sessionId, sessionName }) => {
   useEffect(() => {
     if (open && sessionId) {
       fetchQRCode();
-      
+
+      // Join session room for real-time updates
+      websocketService.joinSession(sessionId);
+
       // Auto-refresh QR code every 60 seconds
       const refreshInterval = setInterval(() => {
         fetchQRCode();
@@ -40,9 +47,17 @@ const QRCodeDisplay = ({ open, onClose, sessionId, sessionName }) => {
       return () => {
         clearInterval(refreshInterval);
         clearInterval(countdownInterval);
+        websocketService.leaveSession(sessionId);
       };
     }
   }, [open, sessionId]);
+
+  // Auto-close dialog when session becomes connected
+  useEffect(() => {
+    if (currentSession && (currentSession.status === 'connected' || currentSession.status === 'authenticating')) {
+      onClose();
+    }
+  }, [currentSession?.status, onClose]);
 
   const fetchQRCode = async () => {
     setLoading(true);
@@ -136,9 +151,16 @@ const QRCodeDisplay = ({ open, onClose, sessionId, sessionName }) => {
               <Typography variant="body2" color="text.secondary" gutterBottom>
                 Open WhatsApp on your phone and scan this QR code. Make sure the QR code is fully visible on your screen.
               </Typography>
-              <Typography variant="caption" color="text.secondary">
-                QR code refreshes in {countdown} seconds
-              </Typography>
+
+              {currentSession?.status === 'authenticating' ? (
+                <Alert severity="success" sx={{ mb: 2 }}>
+                  QR Code scanned! Authenticating...
+                </Alert>
+              ) : (
+                <Typography variant="caption" color="text.secondary">
+                  QR code refreshes in {countdown} seconds
+                </Typography>
+              )}
             </>
           ) : (
             <Alert severity="info">
