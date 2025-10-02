@@ -24,7 +24,16 @@ export const fetchApiKeys = createAsyncThunk(
       const response = await api.get('/api/v1/api-keys');
       return response.data.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.error || 'Failed to fetch API keys');
+      // Handle structured error response from backend
+      if (error.response?.data?.error) {
+        return rejectWithValue(error.response.data.error);
+      }
+      // Handle generic error
+      return rejectWithValue({
+        code: error.response?.status || 500,
+        message: error.response?.data?.message || 'Failed to fetch API keys',
+        details: error.response?.data?.details || []
+      });
     }
   }
 );
@@ -36,7 +45,16 @@ export const getApiKey = createAsyncThunk(
       const response = await api.get(`/api/v1/api-keys/${apiKeyId}`);
       return response.data.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.error || 'Failed to fetch API key');
+      // Handle structured error response from backend
+      if (error.response?.data?.error) {
+        return rejectWithValue(error.response.data.error);
+      }
+      // Handle generic error
+      return rejectWithValue({
+        code: error.response?.status || 500,
+        message: error.response?.data?.message || 'Failed to fetch API key',
+        details: error.response?.data?.details || []
+      });
     }
   }
 );
@@ -48,7 +66,16 @@ export const createApiKey = createAsyncThunk(
       const response = await api.post('/api/v1/api-keys', apiKeyData);
       return response.data.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.error || 'Failed to create API key');
+      // Handle structured error response from backend
+      if (error.response?.data?.error) {
+        return rejectWithValue(error.response.data.error);
+      }
+      // Handle generic error
+      return rejectWithValue({
+        code: error.response?.status || 500,
+        message: error.response?.data?.message || 'Failed to create API key',
+        details: error.response?.data?.details || []
+      });
     }
   }
 );
@@ -60,7 +87,16 @@ export const updateApiKey = createAsyncThunk(
       const response = await api.put(`/api/v1/api-keys/${apiKeyId}`, data);
       return response.data.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.error || 'Failed to update API key');
+      // Handle structured error response from backend
+      if (error.response?.data?.error) {
+        return rejectWithValue(error.response.data.error);
+      }
+      // Handle generic error
+      return rejectWithValue({
+        code: error.response?.status || 500,
+        message: error.response?.data?.message || 'Failed to update API key',
+        details: error.response?.data?.details || []
+      });
     }
   }
 );
@@ -72,7 +108,16 @@ export const deleteApiKey = createAsyncThunk(
       await api.delete(`/api/v1/api-keys/${apiKeyId}`);
       return apiKeyId;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.error || 'Failed to delete API key');
+      // Handle structured error response from backend
+      if (error.response?.data?.error) {
+        return rejectWithValue(error.response.data.error);
+      }
+      // Handle generic error
+      return rejectWithValue({
+        code: error.response?.status || 500,
+        message: error.response?.data?.message || 'Failed to delete API key',
+        details: error.response?.data?.details || []
+      });
     }
   }
 );
@@ -84,7 +129,16 @@ export const revokeApiKey = createAsyncThunk(
       const response = await api.post(`/api/v1/api-keys/${apiKeyId}/revoke`);
       return response.data.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.error || 'Failed to revoke API key');
+      // Handle structured error response from backend
+      if (error.response?.data?.error) {
+        return rejectWithValue(error.response.data.error);
+      }
+      // Handle generic error
+      return rejectWithValue({
+        code: error.response?.status || 500,
+        message: error.response?.data?.message || 'Failed to revoke API key',
+        details: error.response?.data?.details || []
+      });
     }
   }
 );
@@ -96,7 +150,16 @@ export const regenerateApiKey = createAsyncThunk(
       const response = await api.post(`/api/v1/api-keys/${apiKeyId}/regenerate`);
       return response.data.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.error || 'Failed to regenerate API key');
+      // Handle structured error response from backend
+      if (error.response?.data?.error) {
+        return rejectWithValue(error.response.data.error);
+      }
+      // Handle generic error
+      return rejectWithValue({
+        code: error.response?.status || 500,
+        message: error.response?.data?.message || 'Failed to regenerate API key',
+        details: error.response?.data?.details || []
+      });
     }
   }
 );
@@ -108,7 +171,16 @@ export const getApiKeyStats = createAsyncThunk(
       const response = await api.get(`/api/v1/api-keys/${apiKeyId}/stats`);
       return response.data.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.error || 'Failed to fetch API key stats');
+      // Handle structured error response from backend
+      if (error.response?.data?.error) {
+        return rejectWithValue(error.response.data.error);
+      }
+      // Handle generic error
+      return rejectWithValue({
+        code: error.response?.status || 500,
+        message: error.response?.data?.message || 'Failed to fetch API key stats',
+        details: error.response?.data?.details || []
+      });
     }
   }
 );

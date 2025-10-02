@@ -56,24 +56,30 @@ const ApiKeys = () => {
 
   const handleCreateKey = async () => {
     if (!newKeyName.trim()) return;
-    
+
     try {
       await dispatch(createApiKey({ name: newKeyName })).unwrap();
       setNewKeyName('');
     } catch (err) {
       console.error('Failed to create API key:', err);
+      // Handle structured error format
+      const errorMessage = err.message || err || 'Failed to create API key';
+      alert(`Failed to create API key: ${errorMessage}`);
     }
   };
 
   const handleDeleteKey = async () => {
     if (!selectedKey) return;
-    
+
     try {
       await dispatch(deleteApiKey(selectedKey.id)).unwrap();
       setDeleteDialogOpen(false);
       setSelectedKey(null);
     } catch (err) {
       console.error('Failed to delete API key:', err);
+      // Handle structured error format
+      const errorMessage = err.message || err || 'Failed to delete API key';
+      alert(`Failed to delete API key: ${errorMessage}`);
     }
   };
 
@@ -109,7 +115,7 @@ const ApiKeys = () => {
 
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
+          {typeof error === 'object' ? (error.message || error.details?.[0] || 'An error occurred') : error}
         </Alert>
       )}
 
