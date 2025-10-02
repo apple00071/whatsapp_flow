@@ -48,19 +48,26 @@ const Sessions = () => {
     dispatch(fetchSessions());
   }, [dispatch]);
 
+  const [creatingSession, setCreatingSession] = useState(false);
+
   const handleCreateSession = async () => {
-    if (!newSessionName.trim()) return;
-    
+    if (!newSessionName.trim() || creatingSession) return;
+
+    setCreatingSession(true);
     try {
       const result = await dispatch(createSession({ name: newSessionName })).unwrap();
       setCreateDialogOpen(false);
       setNewSessionName('');
-      
+
       // Automatically show QR code for the newly created session
       setSelectedSession(result);
       setQrDialogOpen(true);
     } catch (err) {
       console.error('Failed to create session:', err);
+      // Show error message to user
+      alert(`Failed to create session: ${err.message || 'Unknown error'}`);
+    } finally {
+      setCreatingSession(false);
     }
   };
 
@@ -231,8 +238,8 @@ const Sessions = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setCreateDialogOpen(false)}>Cancel</Button>
-          <Button onClick={handleCreateSession} variant="contained" disabled={!newSessionName.trim()}>
-            Create
+          <Button onClick={handleCreateSession} variant="contained" disabled={!newSessionName.trim() || creatingSession}>
+            {creatingSession ? 'Creating...' : 'Create'}
           </Button>
         </DialogActions>
       </Dialog>

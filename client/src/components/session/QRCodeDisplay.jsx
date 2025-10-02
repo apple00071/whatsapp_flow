@@ -49,7 +49,7 @@ const QRCodeDisplay = ({ open, onClose, sessionId, sessionName }) => {
     
     try {
       const result = await dispatch(getQRCode(sessionId)).unwrap();
-      setQrCode(result.qr);
+      setQrCode(result.qrCode);
     } catch (err) {
       setError(err || 'Failed to load QR code');
     } finally {
