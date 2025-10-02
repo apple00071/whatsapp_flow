@@ -169,7 +169,7 @@ const Sessions = () => {
               
               <CardActions sx={{ justifyContent: 'space-between', px: 2, pb: 2 }}>
                 <Box>
-                  {session.status === 'disconnected' && (
+                  {(session.status === 'disconnected' || session.status === 'qr' || session.status === 'initializing' || session.status === 'failed') && (
                     <IconButton
                       size="small"
                       color="primary"

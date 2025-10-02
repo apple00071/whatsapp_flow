@@ -63,7 +63,25 @@ export const createApiKey = createAsyncThunk(
   'apiKeys/create',
   async (apiKeyData, { rejectWithValue }) => {
     try {
-      const response = await api.post('/api/v1/api-keys', apiKeyData);
+      // Add default scopes if not provided
+      const payload = {
+        name: apiKeyData.name,
+        scopes: apiKeyData.scopes || [
+          'messages:read',
+          'messages:write',
+          'sessions:read',
+          'sessions:write',
+          'contacts:read',
+          'contacts:write',
+          'groups:read',
+          'groups:write',
+          'webhooks:read',
+          'webhooks:write',
+        ],
+        ...apiKeyData
+      };
+
+      const response = await api.post('/api/v1/api-keys', payload);
       return response.data.data;
     } catch (error) {
       // Handle structured error response from backend

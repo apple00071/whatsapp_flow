@@ -124,13 +124,17 @@ const sessionSlice = createSlice({
       state.currentSession = action.payload;
     },
     updateSessionStatus: (state, action) => {
-      const { sessionId, status } = action.payload;
+      const { sessionId, status, phoneNumber, connectedAt } = action.payload;
       const session = state.sessions.find(s => s.id === sessionId);
       if (session) {
         session.status = status;
+        if (phoneNumber) session.phoneNumber = phoneNumber;
+        if (connectedAt) session.connectedAt = connectedAt;
       }
       if (state.currentSession?.id === sessionId) {
         state.currentSession.status = status;
+        if (phoneNumber) state.currentSession.phoneNumber = phoneNumber;
+        if (connectedAt) state.currentSession.connectedAt = connectedAt;
       }
     },
   },

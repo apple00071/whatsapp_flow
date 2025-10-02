@@ -61,17 +61,42 @@ class WebSocketService {
       store.dispatch(updateSessionStatus({
         sessionId: data.sessionId,
         status: data.status,
+        phoneNumber: data.phoneNumber,
+        connectedAt: data.connectedAt,
       }));
-      
+
+      // Show appropriate notification based on status
+      let notificationType = 'info';
+      let message = `Session is now ${data.status}`;
+
+      if (data.status === 'connected') {
+        notificationType = 'success';
+        message = `WhatsApp connected successfully! Phone: ${data.phoneNumber}`;
+      } else if (data.status === 'authenticating') {
+        notificationType = 'info';
+        message = 'QR Code scanned! Authenticating...';
+      } else if (data.status === 'qr') {
+        notificationType = 'info';
+        message = 'QR Code generated. Please scan with WhatsApp.';
+      } else if (data.status === 'failed') {
+        notificationType = 'error';
+        message = 'Session connection failed. Please try again.';
+      }
+
       store.dispatch(addNotification({
-        type: 'info',
-        message: `Session ${data.sessionName || data.sessionId} is now ${data.status}`,
+        type: notificationType,
+        message,
+        duration: notificationType === 'error' ? 5000 : 3000,
       }));
     });
 
     this.socket.on('session:qr', (data) => {
       console.log('QR code received for session:', data.sessionId);
-      // QR code will be fetched via API when needed
+      // Trigger QR code refresh in components
+      store.dispatch(updateSessionStatus({
+        sessionId: data.sessionId,
+        status: 'qr',
+      }));
     });
 
     // Message events
@@ -141,7 +166,7 @@ class WebSocketService {
    */
   joinSession(sessionId) {
     if (this.socket?.connected) {
-      this.socket.emit('join:session', { sessionId });
+      this.socket.emit('session:join', sessionId);
     }
   }
 
@@ -150,7 +175,7 @@ class WebSocketService {
    */
   leaveSession(sessionId) {
     if (this.socket?.connected) {
-      this.socket.emit('leave:session', { sessionId });
+      this.socket.emit('session:leave', sessionId);
     }
   }
 

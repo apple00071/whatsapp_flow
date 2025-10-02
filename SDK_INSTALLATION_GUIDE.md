@@ -27,12 +27,12 @@ Complete guide for integrating the WhatsApp API SDK into external websites and a
 
 #### **1. Install via NPM**
 ```bash
-npm install whatsapp-api-sdk
+npm install whatsapp-flow-api-sdk
 ```
 
 #### **2. Basic Usage**
 ```javascript
-import WhatsAppAPI from 'whatsapp-api-sdk';
+import WhatsAppAPI from 'whatsapp-flow-api-sdk';
 
 // Initialize client
 const client = new WhatsAppAPI({
@@ -94,7 +94,7 @@ async function waitForConnection(sessionId) {
 
 #### **1. Install via pip**
 ```bash
-pip install whatsapp-api-sdk
+pip install whatsapp-flow-api-sdk
 ```
 
 #### **2. Basic Usage**

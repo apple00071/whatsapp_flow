@@ -42,5 +42,8 @@
   "homepage": "https://github.com/apple00071/whatsapp_flow#readme",
   "bugs": {
     "url": "https://github.com/apple00071/whatsapp_flow/issues"
+  },
+  "dependencies": {
+    "whatsapp-flow-api-sdk": "^1.0.0"
   }
 }

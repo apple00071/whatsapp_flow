@@ -54,7 +54,7 @@ const QRCodeDisplay = ({ open, onClose, sessionId, sessionName }) => {
 
   // Auto-close dialog when session becomes connected
   useEffect(() => {
-    if (currentSession && (currentSession.status === 'connected' || currentSession.status === 'authenticating')) {
+    if (currentSession && currentSession.status === 'connected') {
       onClose();
     }
   }, [currentSession?.status, onClose]);
@@ -154,7 +154,11 @@ const QRCodeDisplay = ({ open, onClose, sessionId, sessionName }) => {
 
               {currentSession?.status === 'authenticating' ? (
                 <Alert severity="success" sx={{ mb: 2 }}>
-                  QR Code scanned! Authenticating...
+                  🎉 QR Code scanned! Authenticating...
+                </Alert>
+              ) : currentSession?.status === 'connected' ? (
+                <Alert severity="success" sx={{ mb: 2 }}>
+                  ✅ Connected successfully! Phone: {currentSession.phoneNumber}
                 </Alert>
               ) : (
                 <Typography variant="caption" color="text.secondary">
